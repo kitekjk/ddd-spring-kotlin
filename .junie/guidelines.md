@@ -38,7 +38,7 @@ project-root/
 | Entity | 식별자가 존재하며 변경 가능한 객체 |
 | Value Object | 식별자 없고 불변, 의미 기반 타입 |
 | Repository Interface | 도메인에서 정의하는 저장소 인터페이스 |
-| Domain Service | 복수 Aggregate 간 도메인 규칙, model/service에 위치 |
+| Domain Service | 복수 Aggregate 간 도메인 규칙, domain/service에 위치 |
 
 **패키지 구조 예시:**
 ```
@@ -48,29 +48,28 @@ domain/model/order/
 ├── OrderId.kt            # VO
 ├── OrderRepository.kt    # Repository 인터페이스
 
-domain/model/service/
+domain/service/
 └── OrderPolicyService.kt # 도메인 서비스
 ```
 
 ### 2. application 모듈
 
-- UseCase 정의 및 Application Service 구현
+- UseCase 단위로 정의하고 AppService 를 postfix 로 선언
+- AppService 는 서로 참조 금지
 - 트랜잭션 경계 책임
-- Spring 의존 허용 (`@Service`, `@Transactional` 등)
+- Spring Context 의존 허용 (`@Service`, `@Transactional` 등)
 - domain만 의존 (infrastructure에 의존 금지)
+- 별도의 interfaces 를 사용하지 않고 class로 선언하고 하나의 public 함수만 사용(단일책임원칙)
+- @Transactional 을 함수가 아닌 class에 선언
 
 **구조 예시:**
 ```kotlin
-interface PlaceOrderUseCase {
-    fun execute(command: PlaceOrderCommand): OrderResult
-}
-
 @Service
-class PlaceOrderService(
+@Transactional
+class PlaceOrderAppService(
     private val orderRepository: OrderRepository
-) : PlaceOrderUseCase {
-    @Transactional
-    override fun execute(command: PlaceOrderCommand): OrderResult { ... }
+) {
+    fun execute(command: PlaceOrderCommand): OrderResult { ... }
 }
 ```
 
@@ -165,8 +164,7 @@ domain/
 
 application/
 └── order/
-    ├── PlaceOrderUseCase.kt
-    └── PlaceOrderService.kt
+    ├── PlaceOrderAppService.kt
 
 infrastructure/
 └── persistence/
@@ -203,11 +201,11 @@ Order.kt, OrderItem.kt, OrderId.kt, OrderRepository.kt 를 포함하고,
 ## 작업 로그
 
 - .junie/logs/worklog-yymmdd.md 파일을 만들고 작업한 내역을 기록해줘
+- 작업요청한 프롬프트
 - 작업 시작 시간
 - 작업 완료 시간
 - 수정 내역 요약
 - 수정된 파일 내역
-- 작업요청한 프롬프트
 
 
 ## ✅ 이 문서는 Junie가 자동 인식하여 코드 생성 시 참조됩니다.
