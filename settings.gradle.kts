@@ -1,8 +1,6 @@
 rootProject.name = "ddd-spring-kotlin"
 
-include(
-    "domain",
-    "application",
-    "infrastructure",
-    "interfaces"
-)
+include("domain")
+include("infrastructure")
+include("application")
+include("interfaces")
