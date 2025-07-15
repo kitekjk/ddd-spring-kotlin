@@ -4,6 +4,11 @@ kotlin = "1.9.22"
 coroutines = "1.7.3"
 jackson = "2.16.1"
 spring-dependency-management = "1.1.4"
+junit = "5.10.2"
+mockito = "5.10.0"
+assertj = "3.25.3"
+mockk = "1.13.9"
+kotest = "5.8.0"
 
 [libraries]
 # Spring Boot
@@ -17,7 +22,6 @@ spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-star
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-kotlin-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "coroutines" }
 
 # Jackson
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
@@ -25,9 +29,22 @@ jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-
 # Database
 h2 = { module = "com.h2database:h2", version = "2.2.224" }
 
+# Testing
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version = "5.2.1" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+
 [bundles]
 kotlin = ["kotlin-stdlib", "kotlin-reflect", "kotlin-coroutines-core"]
 spring-boot-web = ["spring-boot-starter", "spring-boot-starter-web", "spring-boot-starter-validation"]
+junit-test = ["junit-jupiter", "junit-jupiter-api", "junit-jupiter-engine", "mockito-core", "mockito-kotlin", "assertj-core"]
+kotest = ["kotest-runner-junit5", "kotest-assertions-core", "mockk"]
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
@@ -35,3 +52,4 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
+kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }

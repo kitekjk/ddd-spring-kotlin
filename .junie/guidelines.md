@@ -24,6 +24,9 @@ project-root/
 
 ## 📌 모듈별 책임
 
+### 0. 공통
+- Dto 클래스는 data class로 만들고 dto 패키지명으로 분리
+
 ### 1. domain 모듈
 
 - 비즈니스 로직, 도메인 모델 정의
@@ -200,8 +203,8 @@ Order.kt, OrderItem.kt, OrderId.kt, OrderRepository.kt 를 포함하고,
 
 ## 작업 로그
 
-- .junie/logs/worklog-yymmdd.md 파일을 만들고 작업한 내역을 기록해줘
-- 작업요청한 프롬프트
+- .junie/logs/worklog-[####].md 파일을 만들고 작업한 내역을 기록해줘(#### 는 순번)
+- 작업 요청할때 입력한 프롬프트
 - 작업 시작 시간
 - 작업 완료 시간
 - 수정 내역 요약
