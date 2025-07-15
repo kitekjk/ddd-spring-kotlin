@@ -19,5 +19,10 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")
 
-    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.spring.boot.starter.test) {
+        exclude(module = "mockito-core")
+    }
+    testImplementation(libs.kotest.runner)
+    testImplementation(libs.kotest.spring)
+    testImplementation(libs.springmockk)
 }

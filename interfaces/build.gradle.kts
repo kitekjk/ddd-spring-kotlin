@@ -13,7 +13,12 @@ dependencies {
     implementation(libs.bundles.spring.boot.web)
     implementation(libs.jackson.module.kotlin)
 
-    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.spring.boot.starter.test) {
+        exclude(module = "mockito-core")
+    }
+    testImplementation(libs.kotest.runner)
+    testImplementation(libs.kotest.spring)
+    testImplementation(libs.springmockk)
 }
 
 tasks.bootJar {

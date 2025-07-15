@@ -1,18 +1,15 @@
 [versions]
 spring-boot = "3.5.3"
-kotlin = "1.9.22"
+kotlin = "1.9.25"
 coroutines = "1.7.3"
 jackson = "2.16.1"
-spring-dependency-management = "1.1.4"
-junit = "5.10.2"
-mockito = "5.10.0"
-assertj = "3.25.3"
-mockk = "1.13.9"
-kotest = "5.8.0"
+spring-dependency-management = "1.1.7"
+kotest = "5.6.2"
+kotest-spring = "1.1.3"
+springmockk = "4.0.2"
 
 [libraries]
 # Spring Boot
-spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter", version.ref = "spring-boot" }
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring-boot" }
 spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "spring-boot" }
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation", version.ref = "spring-boot" }
@@ -29,22 +26,14 @@ jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-
 # Database
 h2 = { module = "com.h2database:h2", version = "2.2.224" }
 
-# Testing
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
-junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
-mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version = "5.2.1" }
-assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
-kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+# Test
+kotest-runner = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotest-spring = { module = "io.kotest.extensions:kotest-extensions-spring", version.ref = "kotest-spring" }
+springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }
 
 [bundles]
 kotlin = ["kotlin-stdlib", "kotlin-reflect", "kotlin-coroutines-core"]
-spring-boot-web = ["spring-boot-starter", "spring-boot-starter-web", "spring-boot-starter-validation"]
-junit-test = ["junit-jupiter", "junit-jupiter-api", "junit-jupiter-engine", "mockito-core", "mockito-kotlin", "assertj-core"]
-kotest = ["kotest-runner-junit5", "kotest-assertions-core", "mockk"]
+spring-boot-web = ["spring-boot-starter-web", "spring-boot-starter-validation"]
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
@@ -52,4 +41,3 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
-kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }

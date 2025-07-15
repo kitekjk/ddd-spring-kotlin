@@ -17,7 +17,13 @@ dependencies {
 
     implementation(libs.bundles.kotlin)
     implementation(libs.spring.boot.starter.data.jpa)
-    implementation(libs.h2)
 
-    testImplementation(libs.spring.boot.starter.test)
+    runtimeOnly(libs.h2)
+
+    testImplementation(libs.spring.boot.starter.test) {
+        exclude(module = "mockito-core")
+    }
+    testImplementation(libs.kotest.runner)
+    testImplementation(libs.kotest.spring)
+    testImplementation(libs.springmockk)
 }
