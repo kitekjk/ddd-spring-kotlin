@@ -32,6 +32,8 @@ project-root/
 - 비즈니스 로직, 도메인 모델 정의
 - 순수 Kotlin 코드로 작성
 - 외부 라이브러리(Spring, JPA 등) 금지
+- Aggregate Root 내에 비즈니스 로직을 만듬
+- 여러 Aggregate와 연관된 비즈니스 로직은 도메인 서비스로 분리
 
 **하위 구성요소 및 역할:**
 
@@ -64,6 +66,7 @@ domain/service/
 - domain만 의존 (infrastructure에 의존 금지)
 - 별도의 interfaces 를 사용하지 않고 class로 선언하고 하나의 public 함수만 사용(단일책임원칙)
 - @Transactional 을 함수가 아닌 class에 선언
+- 비즈니스 로직은 도메인에서 다루게 하고, orchastration 역할만 사용
 
 **구조 예시:**
 ```kotlin
@@ -182,15 +185,7 @@ interfaces/
 
 ---
 
-## 🧠 Junie 프롬프트 예시
 
-```
-order aggregate를 domain.model.order 패키지에 생성해줘.
-Order.kt, OrderItem.kt, OrderId.kt, OrderRepository.kt 를 포함하고,
-도메인 정책은 model.service 하위 OrderPolicyService.kt 로 분리해줘.
-```
-
----
 
 ## 🔒 주의사항 요약
 
@@ -200,6 +195,14 @@ Order.kt, OrderItem.kt, OrderId.kt, OrderRepository.kt 를 포함하고,
 - ✅ 모든 도메인 로직은 테스트 가능하게 작성
 
 ---
+
+## 테스트 코드 작성
+
+- Kotest을 사용
+- Given-When-Then 패턴을 이용
+- Kotest의 shouldBe, shouldNotBe, shouldThrow 등의 매처를 사용
+- 다양한 엣지 케이스에 대한 테스트 코드 작성
+- 모든 입력 유효성 검사 테스트
 
 ## 작업 로그
 
