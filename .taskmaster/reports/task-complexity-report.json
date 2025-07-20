@@ -1,0 +1,93 @@
+{
+	"meta": {
+		"generatedAt": "2025-07-20T08:32:56.122Z",
+		"tasksAnalyzed": 10,
+		"totalTasks": 10,
+		"analysisCount": 10,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": false
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "프로젝트 기반 구조 및 멀티모듈 설정",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Gradle Kotlin DSL 멀티모듈 프로젝트 구조를 DDD 아키텍처에 맞게 설정하는 세부 작업들로 분해해주세요. 각 모듈별 설정, 의존성 관리, 테스트 환경 구성을 포함하여 구체적인 구현 단계로 나누어주세요.",
+			"reasoning": "멀티모듈 설정은 프로젝트 전체의 기반이 되는 중요한 작업이지만, 각 모듈별 설정과 의존성 관리가 복잡하여 체계적인 접근이 필요합니다."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "주문 도메인 모델 구현 (Order Aggregate)",
+			"complexityScore": 8,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Order 애그리게이트의 핵심 엔티티들과 비즈니스 로직을 구현하는 세부 작업으로 분해해주세요. 각 엔티티별 구현, 상태 관리, 도메인 이벤트, JPA 매핑을 별도 작업으로 나누어주세요.",
+			"reasoning": "도메인 모델은 비즈니스 로직의 핵심이며, 애그리게이트 설계와 엔티티 간 관계 설정이 복잡하여 신중한 구현이 필요합니다."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "할인 정책 전략 패턴 구현",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "전략 패턴을 활용한 할인 정책 시스템을 구현하는 세부 작업으로 분해해주세요. 인터페이스 설계, 각 할인 정책별 구현, 할인 계산기 서비스를 별도 작업으로 나누어주세요.",
+			"reasoning": "전략 패턴 구현은 비교적 명확한 구조를 가지고 있지만, 다양한 할인 정책과 환불 시 재계산 로직이 포함되어 중간 수준의 복잡도를 가집니다."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "반품 도메인 모델 구현 (ReturnRequest Aggregate)",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "ReturnRequest 애그리게이트와 구성상품 반품 처리 로직을 구현하는 세부 작업으로 분해해주세요. 애그리게이트 루트, 엔티티 구현, 검증 로직, 도메인 이벤트를 별도 작업으로 나누어주세요.",
+			"reasoning": "반품 도메인은 주문 도메인과의 복잡한 연관관계와 구성상품 처리 로직이 포함되어 있어 중상급 수준의 복잡도를 가집니다."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "주문 생성 및 결제 요청 유스케이스 구현",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "주문 생성부터 결제 완료까지의 전체 플로우를 처리하는 애플리케이션 서비스를 구현하는 세부 작업으로 분해해주세요. 서비스 구현, 외부 시스템 연동, 트랜잭션 관리, 이벤트 처리를 별도 작업으로 나누어주세요.",
+			"reasoning": "여러 외부 시스템과의 연동, 트랜잭션 관리, 보상 처리 등이 포함된 복잡한 비즈니스 플로우로 높은 복잡도를 가집니다."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "반품 요청 및 승인 처리 유스케이스 구현",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "반품 요청부터 관리자 승인까지의 전체 플로우를 처리하는 애플리케이션 서비스를 구현하는 세부 작업으로 분해해주세요. 반품 서비스 구현, 검증 로직, 환불 계산, 재고 처리, 이벤트 발행을 별도 작업으로 나누어주세요.",
+			"reasoning": "구성상품 반품 처리, 할인 정책 고려한 환불 계산, 재고 복원 등 복잡한 비즈니스 로직이 포함되어 높은 복잡도를 가집니다."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "주문 및 반품 REST API 컨트롤러 구현",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "주문과 반품 관련 REST API 엔드포인트를 구현하는 세부 작업으로 분해해주세요. 컨트롤러별 구현, DTO 설계, 예외 처리, API 문서화를 별도 작업으로 나누어주세요.",
+			"reasoning": "표준적인 REST API 구현으로 비교적 명확한 구조를 가지고 있지만, 여러 엔드포인트와 DTO 설계가 필요하여 중간 수준의 복잡도를 가집니다."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "취소 처리 유스케이스 구현",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "주문 취소 기능을 구현하는 세부 작업으로 분해해주세요. 도메인 메서드 추가, 애플리케이션 서비스 구현, 검증 로직, 할인 재계산, 외부 시스템 연동을 별도 작업으로 나누어주세요.",
+			"reasoning": "부분 취소와 전체 취소 처리, 할인 금액 재계산, 결제 취소 연동 등이 포함되어 중상급 수준의 복잡도를 가집니다."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "교환 처리 유스케이스 구현",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "상품 교환 기능을 구현하는 세부 작업으로 분해해주세요. 교환 도메인 모델 구현, 애플리케이션 서비스 구현, 구성상품 교환 로직, 추가 결제 처리, 배송 연동을 별도 작업으로 나누어주세요.",
+			"reasoning": "교환은 반품과 재주문의 조합으로 복잡한 비즈니스 로직과 외부 시스템 연동이 필요하여 중상급 수준의 복잡도를 가집니다."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "이벤트 기반 메시징 및 통계 시스템 구현",
+			"complexityScore": 9,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Kafka 기반 이벤트 시스템과 통계 수집 기능을 구현하는 세부 작업으로 분해해주세요. Kafka 설정, 이벤트 발행자 구현, 이벤트 핸들러, 통계 서비스, 실패 처리, 이벤트 저장소를 별도 작업으로 나누어주세요.",
+			"reasoning": "Kafka 연동, 이벤트 처리, 통계 시스템, 실패 처리 메커니즘 등 다양한 기술적 복잡성이 포함되어 가장 높은 수준의 복잡도를 가집니다."
+		}
+	]
+}

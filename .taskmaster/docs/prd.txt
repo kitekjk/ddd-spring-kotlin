@@ -1,0 +1,213 @@
+# Overview
+
+이 프로젝트는 이커머스 시스템의 핵심 기능인 **주문, 반품, 교환** 처리를 도메인 주도 설계(DDD) 기반으로 재설계하기 위한 것입니다.
+
+### 🎯 문제 정의
+
+* 다양한 상태 전이, 할인 정책, 구성상품 처리, 부분 취소/반품/교환 등 복잡한 비즈니스 로직이 얽혀 있음
+* 이를 기존 모놀리식 아키텍처에서 유지보수하기 어려움
+
+### 👤 타겟 사용자
+
+* 커머스 백오피스 관리자
+* 고객 사용자
+* 제휴 판매자
+
+### 💡 가치
+
+* 도메인 분리와 캡슐화로 유연한 확장성 확보
+* 이벤트 중심 아키텍처 기반으로 통합/연동 용이
+
+---
+
+# Core Features
+
+### ✅ 주문 생성 및 준비
+
+* 상품 정보, 수량, 금액 기반 주문 생성
+* 재고 차감, 결제 요청
+* 중요성: 주문의 시작 지점, 모든 흐름의 기반
+
+### 💰 결제 및 할인 정책
+
+* 할인 전략 패턴 기반 적용
+* 결제 완료 시점에 주문 상태 전이 및 확정 처리
+* 중요성: 금액 정합성 보장, 마케팅 정책 반영
+
+### ❌ 취소 처리
+
+* 배송 전 부분/전체 취소 가능
+* 할인 금액 정산 처리 포함
+* 중요성: 고객 경험 및 정산 로직 정확성 확보
+
+### 🔁 반품 처리
+
+* 구성상품 포함 반품 처리
+* 관리자 승인, 반품 상태 흐름
+* 중요성: CS 응대 자동화, 회수 정책 일관성
+
+### ♻️ 교환 처리
+
+* 구성상품/단일 상품 교환 가능
+* 상태별 이벤트 흐름 처리
+* 중요성: 유연한 응대 정책 설계
+
+### 📊 통계
+
+* 주문/취소/반품/교환 데이터 수집
+* 중요성: 정산, 데이터 기반 전략 수립
+
+---
+
+# User Experience
+
+### 👤 유저 페르소나
+
+* 일반 고객: 마이페이지에서 주문/취소/반품/교환 요청
+* 관리자: 주문 관리, 승인, 회수 관리
+
+### 🔄 주요 유저 플로우
+
+* 주문 → 결제 → 배송 → 수령/취소/반품
+* 반품 요청 → 승인/회수 → 정산/종료
+
+### 🎨 UI/UX 고려사항
+
+* 구성상품 선택 가능한 UI
+* 취소/반품 가능 항목만 표시
+* 상태 기반 진행 단계 UI 제공
+
+---
+
+# Technical Architecture
+
+### ⚙ 시스템 컴포넌트
+
+* `Order` Aggregate
+* `OrderLineItem`, `BundleComponentItem`
+* `ReturnRequest`, `ReturnItem`
+* `DiscountPolicy` (전략 패턴)
+* ApplicationService (유스케이스 별)
+* REST API Controller
+
+### 🧩 데이터 모델
+
+* 주문 → 주문상품 → 구성상품
+* 반품요청 → 반품상품 (구성상품 포함 가능)
+* 할인정보 (금액/비율/적용 대상)
+
+### 🔗 API 및 연동
+
+* 결제 시스템: 결제 요청/응답
+* 재고 시스템: 재고 예약/해제
+* 배송 시스템: 상태 수신
+
+### ☁ 인프라 요건
+
+* Kotlin + Spring Boot 3.5
+* JPA 기반 DB
+* Kafka 기반 이벤트 연동 (선택)
+
+---
+
+# Development Roadmap
+
+### 🥇 MVP
+
+* 주문 생성 및 결제 요청
+* 부분/전체 반품 처리 (관리자 승인 포함)
+* 할인 정책 반영 및 재계산
+* 구성상품 반품 처리 로직 포함
+
+### 🚀 향후 확장
+
+* 교환 요청 흐름
+* 반품 사유 및 이미지 업로드
+* 교환 출고 상태 추적
+* 통계 API 제공
+* 결제 실패 및 보상 처리
+* 외부 할인(쿠폰, 프로모션) 연동
+
+---
+
+# Logical Dependency Chain
+
+### ⚓ 기반 기능
+
+1. 주문 도메인 (Order, OrderLineItem)
+2. 반품 도메인 (`ReturnRequest`, `ReturnItem`)
+3. 할인 정책 (정책 패턴)
+
+### 🚶 유저 시나리오 진입 가능 흐름
+
+4. 주문 API + 주문 상태 전이 흐름
+5. 반품 요청 → 관리자 승인 → 상태 업데이트
+6. 결제 성공 이벤트 처리
+
+### 🔁 점진적 확장
+
+7. 구성상품 처리
+8. 교환 처리
+9. 이벤트 기반 메시징 연동
+10. 통계/보고서 시스템 연동
+
+---
+
+# Risks and Mitigations
+
+### ⚠ 기술적 위험
+
+* 구성상품 반품 시 식별/정산 복잡성
+  → `componentProductId` 사용하여 확장성 확보
+
+* 할인 정책에 따른 환불 금액 계산 이슈
+  → 전략 패턴으로 캡슐화
+
+### 🧪 MVP 판별 어려움
+
+* 너무 많은 흐름 존재
+  → 주문 + 반품 (승인 기반) + 구성상품 기준 반품 → MVP
+
+### 💻 리소스 부족
+
+* 모든 흐름을 단기간에 만들 수 없음
+  → 핵심 기능 단위로 PRD 분할 및 스프린트화 가능
+
+---
+
+# Appendix
+
+### 📑 기술 사양
+
+* Spring Boot 3.5, Kotlin 1.9
+* Gradle Kotlin DSL 멀티 모듈
+* JPA, H2/PostgreSQL
+* 테스트: Kotest 또는 JUnit5
+
+### 🧪 도메인 캡슐화 예시 (반품 처리)
+
+```kotlin
+order.createReturnRequest(commands: List<ReturnItemCommand>)
+```
+
+```kotlin
+OrderLineItem.createReturnItem(componentProductId: UUID?, quantity: Int)
+```
+
+### 📈 Mermaid 시퀀스 예시
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant API
+  participant ReturnAppSvc
+  participant OrderAgg
+  participant ReturnRepo
+
+  User->>API: 반품 요청 제출
+  API->>ReturnAppSvc: requestReturn(cmd)
+  ReturnAppSvc->>OrderAgg: createReturnRequest()
+  OrderAgg->>OrderAgg: LineItem 반환 가능 여부 확인
+  OrderAgg-->>ReturnAppSvc: ReturnRequest
+  ReturnAppSvc->>ReturnRepo: save()
+```

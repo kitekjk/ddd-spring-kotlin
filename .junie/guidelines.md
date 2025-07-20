@@ -9,6 +9,9 @@
 ```
 project-root/
 ├── domain/
+│   └── common/                # 도메인 공영 DTO, VO, etc
+│   └── exception/             # 도메인 예외
+│   └── event/                 # 도메인 이벤트
 │   └── model/
 │       ├── {aggregate}/       # Aggregate별 서브패키지
 │       └── service/           # 여러 Aggregate 관련 도메인 서비스
@@ -25,7 +28,7 @@ project-root/
 ## 📌 모듈별 책임
 
 ### 0. 공통
-- Dto 클래스는 data class로 만들고 dto 패키지명으로 분리
+- Dto 클래스는 data class로 만들고 dto 패키지명으로 분리 
 
 ### 1. domain 모듈
 
@@ -34,6 +37,15 @@ project-root/
 - 외부 라이브러리(Spring, JPA 등) 금지
 - Aggregate Root 내에 비즈니스 로직을 만듬
 - 여러 Aggregate와 연관된 비즈니스 로직은 도메인 서비스로 분리
+
+### 1.1 domain context
+
+- 공용으로 사용되는 요소를 추상화한 interface
+- serviceName(요청도메인), userId, userName, roleId, requestId(uuid), requestedAt(Instant), clientIp 등등
+- http, kafka 이벤트등에서 해더 값으로 전달 받으며 이를 파싱하여 DomainContext 로 만듬
+- Aggregate 와 도메인 서비스의 함수는 항상 1번째 인자로 domain context를 받음
+
+### 1.2 domain 기본 모듈 구조
 
 **하위 구성요소 및 역할:**
 
@@ -55,6 +67,25 @@ domain/model/order/
 
 domain/service/
 └── OrderPolicyService.kt # 도메인 서비스
+```
+
+### 1.3 domain 이벤트 모듈 구조
+- Aggregate 변화가 생기면 항상 1개의 이벤트를 생성 및 발행한다.
+- DomainEvent, DomainEventBase 를 상속 받는다.
+
+**DomainEvent 예시:**
+```kotlin
+interface DomainEvent<T> {
+    val eventId: UUID
+    val occurredOn: Long
+    val context: DomainContext
+    val payload: T
+}
+
+abstract class DomainEventBase<T> : DomainEvent<T> {
+    override val eventId: UUID = UUID.randomUUID()
+    override val occurredOn: Long = Date().time
+}
 ```
 
 ### 2. application 모듈

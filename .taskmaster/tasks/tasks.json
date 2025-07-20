@@ -1,0 +1,745 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "프로젝트 기반 구조 및 멀티모듈 설정",
+        "description": "Kotlin + Spring Boot 3.5 기반 Gradle 멀티모듈 프로젝트 구조를 설정하고 DDD 아키텍처에 맞는 모듈 분리를 구현합니다.",
+        "details": "1. Gradle Kotlin DSL을 사용한 멀티모듈 구조 생성\n2. 모듈 구성: domain, application, infrastructure, presentation\n3. Spring Boot 3.5, Kotlin 1.9 의존성 설정\n4. JPA, H2/PostgreSQL 설정\n5. Kotest 또는 JUnit5 테스트 환경 구성\n6. 기본 패키지 구조: com.ecommerce.order, com.ecommerce.return 등",
+        "testStrategy": "프로젝트 빌드 성공 확인, 기본 Spring Boot 애플리케이션 실행 테스트, 각 모듈 간 의존성 정상 동작 확인",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "루트 프로젝트 및 기본 Gradle 설정",
+            "description": "Gradle Kotlin DSL을 사용한 루트 프로젝트 설정과 공통 의존성 관리를 위한 기본 구조를 생성합니다.",
+            "dependencies": [],
+            "details": "1. settings.gradle.kts 파일 생성 및 멀티모듈 구성\n2. 루트 build.gradle.kts에서 공통 의존성 및 버전 관리\n3. gradle.properties 설정 (Kotlin 1.9, Spring Boot 3.5)\n4. buildSrc 모듈 생성으로 의존성 버전 중앙화\n5. 공통 플러그인 설정 (kotlin-jvm, spring-boot, kotlin-spring)\n6. 프로젝트 기본 디렉토리 구조 생성",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "DDD 아키텍처 기반 모듈 구조 생성",
+            "description": "Domain, Application, Infrastructure, Presentation 레이어별로 모듈을 분리하고 각 모듈의 기본 구조를 설정합니다.",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "1. domain 모듈 생성 (순수 도메인 로직)\n2. application 모듈 생성 (유스케이스 및 서비스)\n3. infrastructure 모듈 생성 (JPA, 외부 시스템 연동)\n4. presentation 모듈 생성 (REST API, 컨트롤러)\n5. 각 모듈별 build.gradle.kts 설정\n6. 모듈 간 의존성 방향 설정 (presentation → application → domain ← infrastructure)",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "각 모듈별 의존성 및 플러그인 설정",
+            "description": "각 모듈의 역할에 맞는 의존성과 플러그인을 설정하고 모듈 간 의존성 관계를 정의합니다.",
+            "dependencies": [
+              "1.2"
+            ],
+            "details": "1. domain 모듈: kotlin-stdlib, validation 의존성만 포함\n2. application 모듈: domain 의존성, Spring Context, Transaction 설정\n3. infrastructure 모듈: JPA, H2/PostgreSQL, domain 의존성 설정\n4. presentation 모듈: Spring Web, application 의존성 설정\n5. 각 모듈별 kotlin-spring 플러그인 적용\n6. 순환 의존성 방지를 위한 의존성 검증 설정",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "데이터베이스 및 JPA 설정",
+            "description": "H2 개발용 DB와 PostgreSQL 운영용 DB 설정, JPA 엔티티 매핑 및 Repository 기본 구조를 구성합니다.",
+            "dependencies": [
+              "1.3"
+            ],
+            "details": "1. application.yml 프로파일별 DB 설정 (dev: H2, prod: PostgreSQL)\n2. JPA 설정 (hibernate.ddl-auto, naming-strategy)\n3. 기본 JPA Repository 인터페이스 정의\n4. 데이터베이스 초기화 스크립트 설정\n5. 트랜잭션 관리 설정\n6. 연결 풀 설정 (HikariCP)",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "테스트 환경 구성 및 기본 패키지 구조 설정",
+            "description": "Kotest 또는 JUnit5 기반 테스트 환경을 구성하고 DDD 패키지 구조에 맞는 기본 패키지를 생성합니다.",
+            "dependencies": [
+              "1.2",
+              "1.3"
+            ],
+            "details": "1. 테스트 의존성 설정 (Kotest, MockK, Testcontainers)\n2. 각 모듈별 테스트 설정 파일 생성\n3. 통합 테스트용 TestConfiguration 클래스 생성\n4. 기본 패키지 구조 생성 (com.ecommerce.order, com.ecommerce.return)\n5. 테스트 프로파일 설정 (test용 H2 DB)\n6. 테스트용 더미 데이터 생성 유틸리티 클래스",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "프로젝트 빌드 및 실행 검증",
+            "description": "전체 멀티모듈 프로젝트의 빌드 성공과 기본 Spring Boot 애플리케이션 실행을 검증합니다.",
+            "dependencies": [
+              "1.1",
+              "1.2",
+              "1.3",
+              "1.4",
+              "1.5"
+            ],
+            "details": "1. 전체 프로젝트 gradle build 실행 및 성공 확인\n2. 기본 Spring Boot Application 클래스 생성\n3. 애플리케이션 실행 테스트 (포트 8080 정상 기동)\n4. 각 모듈별 단위 테스트 실행 확인\n5. H2 콘솔 접속 및 DB 연결 확인\n6. 모듈 간 의존성 주입 정상 동작 검증\n7. 기본 Health Check 엔드포인트 동작 확인",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "주문 도메인 모델 구현 (Order Aggregate)",
+        "description": "Order, OrderLineItem, BundleComponentItem을 포함한 주문 도메인의 핵심 엔티티와 비즈니스 로직을 구현합니다.",
+        "details": "1. Order 애그리게이트 루트 구현\n   - 주문 상태 관리 (PENDING, PAID, SHIPPED, DELIVERED, CANCELLED)\n   - 주문 생성, 상태 전이 메서드\n2. OrderLineItem 엔티티 구현\n   - 상품 정보, 수량, 금액 관리\n   - 구성상품 포함 여부 확인\n3. BundleComponentItem 엔티티 구현\n   - componentProductId를 통한 구성상품 식별\n4. 도메인 이벤트 정의 (OrderCreated, OrderPaid 등)\n5. JPA 엔티티 매핑 및 연관관계 설정",
+        "testStrategy": "도메인 모델 단위 테스트, 상태 전이 로직 검증, 애그리게이트 불변성 확인, JPA 매핑 테스트",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Order 애그리게이트 루트 엔티티 구현",
+            "description": "Order 애그리게이트 루트를 구현하여 주문의 핵심 비즈니스 로직과 상태 관리를 담당합니다.",
+            "dependencies": [],
+            "details": "1. Order 엔티티 클래스 생성 (id, customerId, orderDate, status, totalAmount 등)\n2. 주문 상태 enum 정의 (PENDING, PAID, SHIPPED, DELIVERED, CANCELLED)\n3. 주문 생성 팩토리 메서드 구현\n4. 상태 전이 메서드 구현 (pay(), ship(), deliver(), cancel())\n5. 비즈니스 규칙 검증 로직 구현\n6. 애그리게이트 불변성 보장 로직",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "OrderLineItem 엔티티 구현",
+            "description": "주문 라인 아이템 엔티티를 구현하여 개별 상품의 주문 정보를 관리합니다.",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "1. OrderLineItem 엔티티 클래스 생성 (productId, productName, quantity, unitPrice, totalPrice 등)\n2. 구성상품 포함 여부 확인 메서드 구현\n3. 가격 계산 로직 구현\n4. 수량 변경 메서드 구현\n5. Order와의 연관관계 설정\n6. 도메인 규칙 검증 (최소 수량, 최대 수량 등)",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "BundleComponentItem 엔티티 구현",
+            "description": "번들 상품의 구성 요소를 관리하는 엔티티를 구현합니다.",
+            "dependencies": [
+              "2.2"
+            ],
+            "details": "1. BundleComponentItem 엔티티 클래스 생성 (componentProductId, componentName, quantity 등)\n2. OrderLineItem과의 연관관계 설정\n3. 구성상품 식별 로직 구현\n4. 구성상품별 수량 관리 메서드\n5. 번들 상품 검증 로직\n6. 구성상품 정보 조회 메서드",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "주문 도메인 이벤트 정의 및 발행",
+            "description": "주문 관련 도메인 이벤트를 정의하고 적절한 시점에 발행하는 로직을 구현합니다.",
+            "dependencies": [
+              "2.1",
+              "2.2",
+              "2.3"
+            ],
+            "details": "1. 도메인 이벤트 클래스 정의 (OrderCreated, OrderPaid, OrderShipped, OrderDelivered, OrderCancelled)\n2. 이벤트 발행 로직을 Order 엔티티에 통합\n3. 이벤트 데이터 구조 설계 (주문 정보, 타임스탬프, 메타데이터)\n4. 이벤트 발행 시점 결정 및 구현\n5. 이벤트 직렬화/역직렬화 로직\n6. 이벤트 발행 실패 처리 로직",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "JPA 엔티티 매핑 및 연관관계 설정",
+            "description": "Order 애그리게이트의 모든 엔티티에 대한 JPA 매핑과 연관관계를 설정합니다.",
+            "dependencies": [
+              "2.1",
+              "2.2",
+              "2.3"
+            ],
+            "details": "1. Order 엔티티 JPA 어노테이션 설정 (@Entity, @Table, @Id 등)\n2. OrderLineItem과 Order 간 일대다 연관관계 매핑\n3. BundleComponentItem과 OrderLineItem 간 일대다 연관관계 매핑\n4. 영속성 컨텍스트 관리 설정 (cascade, fetch 전략)\n5. 인덱스 및 제약조건 설정\n6. 감사(Audit) 필드 설정 (생성일시, 수정일시)\n7. 커스텀 타입 컨버터 구현 (상태 enum 등)",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "할인 정책 전략 패턴 구현",
+        "description": "다양한 할인 정책을 전략 패턴으로 구현하여 유연한 할인 적용 및 환불 금액 계산을 지원합니다.",
+        "details": "1. DiscountPolicy 인터페이스 정의\n   - calculateDiscount(order: Order): DiscountResult\n   - calculateRefundAmount(returnItems: List<ReturnItem>): Money\n2. 구체적인 할인 정책 구현\n   - PercentageDiscountPolicy (비율 할인)\n   - FixedAmountDiscountPolicy (고정 금액 할인)\n   - BundleDiscountPolicy (구성상품 할인)\n3. DiscountCalculator 서비스 구현\n4. 할인 정보 저장을 위한 DiscountInfo 값 객체\n5. 환불 시 할인 금액 재계산 로직",
+        "testStrategy": "각 할인 정책별 단위 테스트, 할인 금액 계산 정확성 검증, 환불 시 할인 재계산 테스트",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "DiscountPolicy 인터페이스 및 기본 구조 설계",
+            "description": "할인 정책의 핵심 인터페이스와 관련 값 객체들을 설계하고 구현합니다.",
+            "dependencies": [],
+            "details": "1. DiscountPolicy 인터페이스 정의 (calculateDiscount, calculateRefundAmount 메서드)\n2. DiscountResult 값 객체 구현 (할인 금액, 할인 유형, 적용 규칙 정보)\n3. DiscountInfo 값 객체 구현 (할인 정보 저장용)\n4. Money 값 객체 구현 (금액 계산 로직)\n5. 할인 정책 타입 열거형 정의\n6. 기본 예외 클래스 정의 (InvalidDiscountException 등)",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "구체적인 할인 정책 구현체 개발",
+            "description": "비율 할인, 고정 금액 할인, 구성상품 할인 정책을 각각 구현합니다.",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "1. PercentageDiscountPolicy 구현 (할인율 기반 계산)\n2. FixedAmountDiscountPolicy 구현 (고정 금액 할인)\n3. BundleDiscountPolicy 구현 (구성상품 할인 로직)\n4. 각 정책별 할인 조건 검증 로직\n5. 최대/최소 할인 금액 제한 처리\n6. 할인 정책별 환불 금액 계산 로직\n7. 할인 정책 팩토리 패턴 구현",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "DiscountCalculator 서비스 구현",
+            "description": "할인 정책을 관리하고 할인 계산을 수행하는 서비스를 구현합니다.",
+            "dependencies": [
+              "3.2"
+            ],
+            "details": "1. DiscountCalculator 서비스 클래스 구현\n2. 할인 정책 선택 및 적용 로직\n3. 복수 할인 정책 적용 시 우선순위 처리\n4. 할인 적용 결과 검증 및 로깅\n5. 할인 정책 캐싱 메커니즘\n6. 할인 계산 히스토리 관리\n7. Spring Bean 설정 및 의존성 주입",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "환불 시 할인 재계산 로직 및 테스트 구현",
+            "description": "환불 상황에서의 할인 금액 재계산 로직을 구현하고 전체 시스템을 테스트합니다.",
+            "dependencies": [
+              "3.3"
+            ],
+            "details": "1. 환불 시 할인 금액 재계산 알고리즘 구현\n2. 부분 환불 시 할인 비례 배분 로직\n3. 구성상품 환불 시 할인 처리 로직\n4. 각 할인 정책별 단위 테스트 작성\n5. 할인 계산 정확성 검증 테스트\n6. 환불 시나리오별 통합 테스트\n7. 성능 테스트 및 최적화\n8. 문서화 및 사용 가이드 작성",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "반품 도메인 모델 구현 (ReturnRequest Aggregate)",
+        "description": "ReturnRequest, ReturnItem을 포함한 반품 도메인 모델을 구현하고 구성상품 반품 처리 로직을 포함합니다.",
+        "details": "1. ReturnRequest 애그리게이트 루트 구현\n   - 반품 상태 관리 (REQUESTED, APPROVED, REJECTED, COMPLETED)\n   - 관리자 승인 처리 메서드\n2. ReturnItem 엔티티 구현\n   - OrderLineItem과의 연관관계\n   - componentProductId를 통한 구성상품 반품 지원\n   - 반품 수량 및 금액 관리\n3. 반품 가능 여부 검증 로직\n4. 도메인 이벤트 정의 (ReturnRequested, ReturnApproved 등)\n5. Order.createReturnRequest() 메서드 구현",
+        "testStrategy": "반품 도메인 모델 단위 테스트, 구성상품 반품 로직 검증, 반품 가능 여부 검증 테스트, 상태 전이 테스트",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "ReturnRequest 애그리게이트 루트 구현",
+            "description": "ReturnRequest 애그리게이트 루트를 구현하고 반품 상태 관리 및 관리자 승인 처리 메서드를 포함합니다.",
+            "dependencies": [],
+            "details": "1. ReturnRequest 애그리게이트 루트 클래스 생성\n2. 반품 상태 관리 (REQUESTED, APPROVED, REJECTED, COMPLETED)\n3. 관리자 승인 처리 메서드 구현\n4. 반품 요청 생성 메서드\n5. 상태 전이 검증 로직\n6. 애그리게이트 불변성 보장",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "ReturnItem 엔티티 구현",
+            "description": "ReturnItem 엔티티를 구현하고 OrderLineItem과의 연관관계 및 구성상품 반품 지원 기능을 포함합니다.",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "1. ReturnItem 엔티티 클래스 생성\n2. OrderLineItem과의 연관관계 설정\n3. componentProductId를 통한 구성상품 반품 지원\n4. 반품 수량 및 금액 관리 로직\n5. JPA 매핑 설정\n6. 반품 가능 수량 검증",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "반품 가능 여부 검증 로직 구현",
+            "description": "반품 요청 시 반품 가능 여부를 검증하는 비즈니스 로직을 구현합니다.",
+            "dependencies": [
+              "4.1",
+              "4.2"
+            ],
+            "details": "1. 반품 기간 검증 로직\n2. 주문 상태별 반품 가능 여부 확인\n3. 이미 반품된 수량 대비 추가 반품 가능 수량 검증\n4. 구성상품 반품 시 전체/부분 반품 규칙 적용\n5. 반품 불가 상품 유형 검증\n6. 커스텀 검증 규칙 확장 가능한 구조",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "반품 도메인 이벤트 정의 및 구현",
+            "description": "반품 프로세스에서 발생하는 도메인 이벤트들을 정의하고 구현합니다.",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "1. ReturnRequested 이벤트 정의\n2. ReturnApproved 이벤트 정의\n3. ReturnRejected 이벤트 정의\n4. ReturnCompleted 이벤트 정의\n5. 이벤트 발행 시점 및 조건 설정\n6. 이벤트 페이로드 데이터 구조 정의",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Order.createReturnRequest() 메서드 구현",
+            "description": "Order 애그리게이트에서 반품 요청을 생성하는 메서드를 구현하고 구성상품 반품 처리 로직을 포함합니다.",
+            "dependencies": [
+              "4.1",
+              "4.2",
+              "4.3"
+            ],
+            "details": "1. Order 애그리게이트에 createReturnRequest() 메서드 추가\n2. 반품 요청 생성 시 검증 로직 호출\n3. 구성상품 반품 시 BundleComponentItem 처리\n4. ReturnRequest 애그리게이트 생성 및 초기화\n5. 반품 요청 생성 시 도메인 이벤트 발행\n6. 트랜잭션 경계 및 일관성 보장",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "주문 생성 및 결제 요청 유스케이스 구현",
+        "description": "주문 생성부터 결제 요청까지의 전체 플로우를 처리하는 애플리케이션 서비스를 구현합니다.",
+        "details": "1. OrderApplicationService 구현\n   - createOrder(command: CreateOrderCommand): OrderResult\n   - processPayment(orderId: UUID, paymentInfo: PaymentInfo)\n2. 재고 시스템 연동을 위한 InventoryService 인터페이스\n3. 결제 시스템 연동을 위한 PaymentService 인터페이스\n4. 주문 생성 시 할인 정책 적용\n5. 결제 완료 시 주문 상태 전이 처리\n6. 도메인 이벤트 발행 및 처리\n7. 트랜잭션 관리 및 보상 처리",
+        "testStrategy": "주문 생성 플로우 통합 테스트, 할인 적용 검증, 결제 연동 모킹 테스트, 실패 시나리오 테스트",
+        "priority": "high",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "OrderApplicationService 핵심 비즈니스 로직 구현",
+            "description": "주문 생성과 결제 처리를 담당하는 애플리케이션 서비스의 핵심 메서드들을 구현합니다. 할인 정책 적용과 주문 상태 전이 로직을 포함합니다.",
+            "dependencies": [],
+            "details": "1. createOrder(command: CreateOrderCommand): OrderResult 메서드 구현\n2. processPayment(orderId: UUID, paymentInfo: PaymentInfo) 메서드 구현\n3. 할인 정책 적용 로직 구현\n4. 주문 상태 전이 처리 로직\n5. 비즈니스 규칙 검증 로직",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "외부 시스템 연동 인터페이스 및 구현체 개발",
+            "description": "재고 시스템과 결제 시스템과의 연동을 위한 인터페이스를 정의하고 구현체를 개발합니다.",
+            "dependencies": [],
+            "details": "1. InventoryService 인터페이스 정의 및 구현\n2. PaymentService 인터페이스 정의 및 구현\n3. 외부 API 호출 로직 구현\n4. 연동 실패 시 예외 처리\n5. 재시도 메커니즘 구현\n6. 외부 시스템 응답 매핑",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "분산 트랜잭션 관리 및 보상 처리 구현",
+            "description": "주문-재고-결제 간의 분산 트랜잭션을 관리하고 실패 시 보상 처리를 구현합니다.",
+            "dependencies": [
+              "5.1",
+              "5.2"
+            ],
+            "details": "1. Saga 패턴 기반 트랜잭션 관리\n2. 보상 트랜잭션 구현\n3. 트랜잭션 상태 추적\n4. 롤백 처리 로직\n5. 데이터 일관성 보장\n6. 실패 시나리오별 복구 전략",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "도메인 이벤트 발행 및 처리 시스템 구현",
+            "description": "주문 생성과 결제 완료 시 발생하는 도메인 이벤트를 발행하고 처리하는 시스템을 구현합니다.",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "1. OrderCreated, OrderPaid 등 도메인 이벤트 정의\n2. DomainEventPublisher 구현\n3. 이벤트 핸들러 구현\n4. 비동기 이벤트 처리\n5. 이벤트 순서 보장\n6. 이벤트 실패 시 재처리 로직",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "주문 플로우 통합 테스트 및 검증",
+            "description": "주문 생성부터 결제 완료까지의 전체 플로우에 대한 통합 테스트를 구현하고 다양한 시나리오를 검증합니다.",
+            "dependencies": [
+              "5.1",
+              "5.2",
+              "5.3",
+              "5.4"
+            ],
+            "details": "1. 정상 주문 플로우 통합 테스트\n2. 할인 적용 검증 테스트\n3. 외부 시스템 모킹 테스트\n4. 결제 실패 시나리오 테스트\n5. 재고 부족 시나리오 테스트\n6. 성능 테스트 및 부하 테스트",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "에러 처리 및 모니터링 시스템 구현",
+            "description": "주문 처리 과정에서 발생할 수 있는 다양한 에러 상황을 처리하고 모니터링할 수 있는 시스템을 구현합니다.",
+            "dependencies": [
+              "5.3",
+              "5.4"
+            ],
+            "details": "1. 커스텀 예외 클래스 정의\n2. 글로벌 예외 처리기 구현\n3. 로깅 및 알림 시스템\n4. 메트릭 수집 및 모니터링\n5. 헬스체크 엔드포인트\n6. 장애 복구 가이드라인",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "반품 요청 및 승인 처리 유스케이스 구현",
+        "description": "고객의 반품 요청부터 관리자 승인, 상태 업데이트까지의 전체 반품 처리 플로우를 구현합니다.",
+        "details": "1. ReturnApplicationService 구현\n   - requestReturn(command: RequestReturnCommand): ReturnResult\n   - approveReturn(returnId: UUID, adminId: UUID)\n   - rejectReturn(returnId: UUID, reason: String)\n2. 반품 가능 여부 검증 로직\n3. 구성상품 포함 반품 처리\n4. 환불 금액 계산 (할인 정책 고려)\n5. 재고 복원 처리\n6. 반품 상태별 이벤트 발행\n7. Mermaid 시퀀스 다이어그램에 따른 플로우 구현",
+        "testStrategy": "반품 요청 플로우 통합 테스트, 구성상품 반품 시나리오 테스트, 환불 금액 계산 검증, 관리자 승인 프로세스 테스트",
+        "priority": "high",
+        "dependencies": [
+          4,
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "ReturnApplicationService 구현",
+            "description": "반품 요청, 승인, 거부 기능을 포함한 애플리케이션 서비스를 구현합니다.",
+            "dependencies": [],
+            "details": "requestReturn(command: RequestReturnCommand): ReturnResult, approveReturn(returnId: UUID, adminId: UUID), rejectReturn(returnId: UUID, reason: String) 메서드 구현. 반품 요청 플로우 전체를 관리하는 서비스 레이어 구현.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "반품 가능 여부 검증 로직 구현",
+            "description": "주문 상태, 배송 상태, 반품 기한 등을 확인하여 반품 가능 여부를 검증하는 로직을 구현합니다.",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "주문 상태별 반품 가능 여부 확인, 배송 완료 후 반품 기한 검증, 구성상품 포함 주문의 반품 규칙 적용, 이미 반품/교환 진행 중인 상품 중복 처리 방지 로직 구현.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "환불 금액 계산 로직 구현",
+            "description": "할인 정책을 고려한 정확한 환불 금액을 계산하는 로직을 구현합니다.",
+            "dependencies": [
+              "6.2"
+            ],
+            "details": "원래 주문 금액에서 적용된 할인 정책 분석, 부분 반품 시 할인 금액 비례 계산, 구성상품 반품 시 번들 할인 재계산, 배송비 환불 정책 적용 로직 구현.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "재고 복원 처리 로직 구현",
+            "description": "반품 승인 시 해당 상품의 재고를 복원하는 로직을 구현합니다.",
+            "dependencies": [
+              "6.2"
+            ],
+            "details": "반품 승인 시 상품별 재고 수량 복원, 구성상품 포함 반품 시 각 구성 요소별 재고 복원, 재고 복원 실패 시 롤백 처리, 재고 시스템과의 연동 인터페이스 구현.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "반품 상태별 이벤트 발행 구현",
+            "description": "반품 프로세스의 각 단계별로 적절한 도메인 이벤트를 발행하는 기능을 구현합니다.",
+            "dependencies": [
+              "6.1",
+              "6.3",
+              "6.4"
+            ],
+            "details": "ReturnRequested, ReturnApproved, ReturnRejected, RefundProcessed 등 반품 상태별 이벤트 정의 및 발행, 이벤트 페이로드에 필요한 데이터 포함, 외부 시스템 연동을 위한 이벤트 구조 설계.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "반품 처리 통합 테스트 구현",
+            "description": "전체 반품 플로우에 대한 통합 테스트와 다양한 시나리오별 테스트를 구현합니다.",
+            "dependencies": [
+              "6.1",
+              "6.2",
+              "6.3",
+              "6.4",
+              "6.5"
+            ],
+            "details": "반품 요청부터 승인까지의 전체 플로우 통합 테스트, 구성상품 포함 반품 시나리오 테스트, 환불 금액 계산 정확성 검증 테스트, 관리자 승인/거부 프로세스 테스트, 예외 상황 처리 테스트 구현.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "주문 및 반품 REST API 컨트롤러 구현",
+        "description": "주문 생성, 조회, 반품 요청 등의 REST API 엔드포인트를 구현하고 적절한 HTTP 상태 코드와 응답 형식을 제공합니다.",
+        "details": "1. OrderController 구현\n   - POST /orders (주문 생성)\n   - GET /orders/{orderId} (주문 조회)\n   - PUT /orders/{orderId}/payment (결제 처리)\n2. ReturnController 구현\n   - POST /orders/{orderId}/returns (반품 요청)\n   - GET /returns/{returnId} (반품 조회)\n   - PUT /returns/{returnId}/approve (관리자 승인)\n3. DTO 클래스 구현 (Request/Response)\n4. 예외 처리 및 에러 응답 표준화\n5. API 문서화 (Swagger/OpenAPI)\n6. 입력 값 검증 (Bean Validation)",
+        "testStrategy": "REST API 통합 테스트, 각 엔드포인트별 성공/실패 시나리오 테스트, DTO 직렬화/역직렬화 테스트",
+        "priority": "medium",
+        "dependencies": [
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "주문 및 반품 컨트롤러 구현",
+            "description": "OrderController와 ReturnController의 REST API 엔드포인트를 구현하고 HTTP 상태 코드 및 응답 형식을 정의합니다.",
+            "dependencies": [],
+            "details": "1. OrderController 구현\n   - POST /orders (주문 생성)\n   - GET /orders/{orderId} (주문 조회)\n   - PUT /orders/{orderId}/payment (결제 처리)\n2. ReturnController 구현\n   - POST /orders/{orderId}/returns (반품 요청)\n   - GET /returns/{returnId} (반품 조회)\n   - PUT /returns/{returnId}/approve (관리자 승인)\n3. HTTP 상태 코드 표준화 (200, 201, 400, 404, 500 등)\n4. 컨트롤러 레벨 공통 설정 및 헤더 처리",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Request/Response DTO 설계 및 구현",
+            "description": "주문 및 반품 API에 필요한 모든 DTO 클래스를 설계하고 구현하며 직렬화/역직렬화를 처리합니다.",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "1. 주문 관련 DTO 구현\n   - CreateOrderRequest/Response\n   - OrderDetailResponse\n   - PaymentRequest/Response\n2. 반품 관련 DTO 구현\n   - CreateReturnRequest/Response\n   - ReturnDetailResponse\n   - ApproveReturnRequest/Response\n3. JSON 직렬화/역직렬화 설정\n4. DTO 간 변환 매퍼 구현\n5. 중첩 객체 및 컬렉션 처리",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "예외 처리 및 에러 응답 표준화",
+            "description": "API 전반에 걸친 예외 처리 메커니즘을 구현하고 일관된 에러 응답 형식을 제공합니다.",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "1. GlobalExceptionHandler 구현\n   - 비즈니스 예외 처리\n   - 검증 실패 예외 처리\n   - 시스템 예외 처리\n2. 표준 에러 응답 DTO 정의\n   - ErrorResponse 클래스\n   - 에러 코드 및 메시지 표준화\n3. Bean Validation 예외 처리\n4. 커스텀 예외 클래스 정의\n5. 로깅 및 모니터링 연동",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "API 문서화 및 입력값 검증",
+            "description": "Swagger/OpenAPI를 활용한 API 문서화와 Bean Validation을 통한 입력값 검증을 구현합니다.",
+            "dependencies": [
+              "7.2",
+              "7.3"
+            ],
+            "details": "1. Swagger/OpenAPI 설정\n   - API 문서 자동 생성 설정\n   - 엔드포인트별 상세 문서화\n2. Bean Validation 적용\n   - DTO 필드별 검증 어노테이션\n   - 커스텀 검증 로직 구현\n3. API 문서 예제 데이터 작성\n4. 인증/인가 정보 문서화\n5. 에러 응답 예제 문서화\n6. API 버전 관리 설정",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "취소 처리 유스케이스 구현",
+        "description": "배송 전 부분/전체 취소 기능을 구현하고 할인 금액 정산 처리를 포함합니다.",
+        "details": "1. Order 도메인에 취소 관련 메서드 추가\n   - cancelOrder(reason: String)\n   - cancelOrderLineItem(lineItemId: UUID, quantity: Int)\n2. CancellationApplicationService 구현\n   - cancelOrder(orderId: UUID, reason: String)\n   - partialCancelOrder(command: PartialCancelCommand)\n3. 취소 가능 여부 검증 (배송 상태 확인)\n4. 할인 금액 재계산 및 환불 처리\n5. 재고 복원 처리\n6. 취소 관련 도메인 이벤트 발행\n7. 결제 취소 연동",
+        "testStrategy": "전체/부분 취소 시나리오 테스트, 할인 금액 재계산 검증, 취소 불가능한 상태에서의 예외 처리 테스트",
+        "priority": "medium",
+        "dependencies": [
+          5,
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Order 도메인에 취소 관련 메서드 추가",
+            "description": "Order 애그리게이트에 전체 취소와 부분 취소를 처리하는 도메인 메서드를 구현합니다. 취소 가능 상태 검증과 취소 사유 관리를 포함합니다.",
+            "dependencies": [],
+            "details": "cancelOrder(reason: String), cancelOrderLineItem(lineItemId: UUID, quantity: Int) 메서드 구현, 취소 가능 상태 검증 로직, 취소 사유 저장, 주문 상태 업데이트",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "CancellationApplicationService 구현",
+            "description": "취소 처리를 담당하는 애플리케이션 서비스를 구현합니다. 전체 취소와 부분 취소 유스케이스를 처리합니다.",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "cancelOrder(orderId: UUID, reason: String), partialCancelOrder(command: PartialCancelCommand) 메서드 구현, 트랜잭션 관리, 도메인 이벤트 발행",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "취소 가능 여부 검증 로직 구현",
+            "description": "주문의 배송 상태와 결제 상태를 확인하여 취소 가능 여부를 검증하는 로직을 구현합니다.",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "배송 상태 확인, 결제 상태 검증, 취소 불가능한 경우 예외 처리, 부분 취소 시 수량 검증",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "할인 금액 재계산 및 환불 처리",
+            "description": "부분 취소 시 할인 금액을 재계산하고 환불 금액을 산정하는 로직을 구현합니다.",
+            "dependencies": [
+              "8.2",
+              "8.3"
+            ],
+            "details": "할인 금액 비례 배분 계산, 환불 금액 산정, 쿠폰/적립금 복원 처리, 환불 정보 저장",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "외부 시스템 연동 처리",
+            "description": "재고 복원, 결제 취소, 배송 취소 등 외부 시스템과의 연동을 처리합니다.",
+            "dependencies": [
+              "8.2",
+              "8.4"
+            ],
+            "details": "재고 복원 처리, 결제 시스템 취소 연동, 배송 시스템 취소 연동, 취소 관련 도메인 이벤트 발행, 외부 시스템 연동 실패 시 보상 트랜잭션",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "교환 처리 유스케이스 구현",
+        "description": "구성상품/단일 상품 교환 기능을 구현하고 상태별 이벤트 흐름을 처리합니다.",
+        "details": "1. ExchangeRequest 도메인 모델 구현\n   - 교환 상태 관리 (REQUESTED, APPROVED, SHIPPED, COMPLETED)\n   - 원본 상품과 교환 상품 정보 관리\n2. ExchangeApplicationService 구현\n   - requestExchange(command: RequestExchangeCommand)\n   - approveExchange(exchangeId: UUID)\n   - processExchangeShipment(exchangeId: UUID)\n3. 구성상품 교환 처리 로직\n4. 교환 시 추가 결제/환불 처리\n5. 교환 상태별 이벤트 발행\n6. 배송 시스템과의 연동",
+        "testStrategy": "교환 요청 플로우 테스트, 구성상품 교환 시나리오 테스트, 추가 결제/환불 로직 검증",
+        "priority": "low",
+        "dependencies": [
+          4,
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "교환 도메인 모델 구현",
+            "description": "ExchangeRequest 애그리게이트 루트와 교환 관련 도메인 엔티티들을 구현합니다. 교환 상태 관리, 원본 상품과 교환 상품 정보 관리, 도메인 이벤트 정의를 포함합니다.",
+            "dependencies": [],
+            "details": "1. ExchangeRequest 애그리게이트 루트 구현\n2. 교환 상태 열거형 정의 (REQUESTED, APPROVED, SHIPPED, COMPLETED, REJECTED)\n3. 원본 상품과 교환 상품 정보를 담는 ExchangeItem 엔티티\n4. 교환 사유 및 메모 관리\n5. 교환 관련 도메인 이벤트 정의 (ExchangeRequested, ExchangeApproved 등)\n6. JPA 엔티티 매핑 및 연관관계 설정",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "교환 애플리케이션 서비스 구현",
+            "description": "교환 요청, 승인, 배송 처리 등의 비즈니스 로직을 담당하는 ExchangeApplicationService를 구현합니다.",
+            "dependencies": [
+              "9.1"
+            ],
+            "details": "1. ExchangeApplicationService 클래스 구현\n2. requestExchange(command: RequestExchangeCommand) 메서드\n3. approveExchange(exchangeId: UUID) 메서드\n4. processExchangeShipment(exchangeId: UUID) 메서드\n5. rejectExchange(exchangeId: UUID, reason: String) 메서드\n6. 교환 상태별 비즈니스 규칙 검증\n7. 도메인 이벤트 발행 처리",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "구성상품 교환 로직 구현",
+            "description": "번들 상품의 구성요소별 교환 처리 로직을 구현합니다. 구성상품 일부만 교환하는 경우와 전체 교환하는 경우를 모두 처리합니다.",
+            "dependencies": [
+              "9.2"
+            ],
+            "details": "1. 구성상품 교환 가능 여부 검증 로직\n2. 구성상품 부분 교환 처리\n3. 구성상품 전체 교환 처리\n4. 구성상품 교환 시 가격 재계산\n5. 구성상품별 재고 확인 및 처리\n6. 구성상품 교환 이벤트 발행",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "교환 시 추가 결제 처리 구현",
+            "description": "교환 상품의 가격 차이로 인한 추가 결제 또는 환불 처리 로직을 구현합니다.",
+            "dependencies": [
+              "9.2"
+            ],
+            "details": "1. 교환 상품 가격 차이 계산 로직\n2. 추가 결제 필요 시 결제 시스템 연동\n3. 환불 필요 시 환불 처리\n4. 할인 쿠폰 재적용 로직\n5. 배송비 재계산 처리\n6. 결제/환불 완료 이벤트 처리\n7. 결제 실패 시 교환 취소 처리",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "교환 배송 시스템 연동 구현",
+            "description": "교환 상품의 회수 배송과 신규 배송을 처리하기 위한 배송 시스템 연동을 구현합니다.",
+            "dependencies": [
+              "9.2"
+            ],
+            "details": "1. 원본 상품 회수 배송 요청 처리\n2. 교환 상품 신규 배송 요청 처리\n3. 배송 상태 추적 및 업데이트\n4. 배송 완료 시 교환 상태 업데이트\n5. 배송 실패 시 예외 처리\n6. 배송 관련 이벤트 발행 및 처리\n7. 배송비 정산 처리",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "이벤트 기반 메시징 및 통계 시스템 구현",
+        "description": "Kafka 기반 이벤트 연동과 주문/취소/반품/교환 데이터 수집을 위한 통계 시스템을 구현합니다.",
+        "details": "1. Kafka 설정 및 이벤트 발행자 구현\n   - DomainEventPublisher 인터페이스\n   - KafkaEventPublisher 구현체\n2. 도메인 이벤트 직렬화/역직렬화\n3. 이벤트 핸들러 구현\n   - 외부 시스템 연동 (재고, 결제, 배송)\n   - 통계 데이터 수집\n4. StatisticsService 구현\n   - 주문/취소/반품/교환 통계 수집\n   - 일별/월별 집계 데이터 생성\n5. 통계 조회 API 구현\n6. 이벤트 재처리 및 실패 처리 메커니즘\n7. 이벤트 저장소 (Event Store) 구현",
+        "testStrategy": "이벤트 발행/수신 테스트, 통계 데이터 정확성 검증, 이벤트 실패 시나리오 테스트, Kafka 연동 통합 테스트",
+        "priority": "low",
+        "dependencies": [
+          7,
+          8,
+          9
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Kafka 설정 및 기본 인프라 구성",
+            "description": "Kafka 브로커 설정, 토픽 생성, Spring Kafka 의존성 추가 및 기본 설정을 구현합니다.",
+            "dependencies": [],
+            "details": "1. Kafka 브로커 및 Zookeeper 설정\n2. Spring Kafka 의존성 추가\n3. 주문/취소/반품/교환 관련 토픽 생성\n4. Kafka Producer/Consumer 기본 설정\n5. 직렬화/역직렬화 설정 (JSON)\n6. 연결 테스트 및 기본 동작 확인",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "도메인 이벤트 발행자 구현",
+            "description": "DomainEventPublisher 인터페이스와 KafkaEventPublisher 구현체를 개발하여 도메인 이벤트를 Kafka로 발행하는 기능을 구현합니다.",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "1. DomainEventPublisher 인터페이스 정의\n2. KafkaEventPublisher 구현체 개발\n3. 도메인 이벤트 직렬화 로직 구현\n4. 이벤트 메타데이터 추가 (timestamp, eventId 등)\n5. 비동기 발행 처리\n6. 발행 실패 시 로깅 및 예외 처리",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "이벤트 핸들러 구현",
+            "description": "Kafka에서 수신한 이벤트를 처리하는 핸들러들을 구현하여 외부 시스템 연동과 통계 데이터 수집을 처리합니다.",
+            "dependencies": [
+              "10.2"
+            ],
+            "details": "1. OrderEventHandler 구현 (주문 생성/상태 변경 처리)\n2. CancellationEventHandler 구현 (취소 이벤트 처리)\n3. ReturnEventHandler 구현 (반품 이벤트 처리)\n4. ExchangeEventHandler 구현 (교환 이벤트 처리)\n5. 외부 시스템 연동 (재고, 결제, 배송)\n6. 이벤트 중복 처리 방지 로직",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "통계 서비스 구현",
+            "description": "주문/취소/반품/교환 데이터를 수집하고 일별/월별 집계 데이터를 생성하는 StatisticsService를 구현합니다.",
+            "dependencies": [
+              "10.3"
+            ],
+            "details": "1. StatisticsService 인터페이스 및 구현체 개발\n2. 주문 통계 수집 로직 (건수, 금액, 상품별)\n3. 취소/반품/교환 통계 수집\n4. 일별/월별 집계 데이터 생성\n5. 통계 데이터 저장을 위한 엔티티 설계\n6. 배치 처리를 통한 대용량 데이터 집계",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "이벤트 실패 처리 및 재처리 메커니즘 구현",
+            "description": "이벤트 처리 실패 시 재시도, Dead Letter Queue, 수동 재처리 기능을 구현합니다.",
+            "dependencies": [
+              "10.3"
+            ],
+            "details": "1. 이벤트 처리 실패 감지 및 로깅\n2. 재시도 메커니즘 구현 (exponential backoff)\n3. Dead Letter Queue 설정 및 처리\n4. 실패한 이벤트 저장 및 관리\n5. 수동 재처리 API 구현\n6. 실패 통계 및 모니터링 기능",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "이벤트 저장소 (Event Store) 구현",
+            "description": "모든 도메인 이벤트를 영구 저장하고 조회할 수 있는 Event Store를 구현합니다.",
+            "dependencies": [
+              "10.2"
+            ],
+            "details": "1. EventStore 인터페이스 및 구현체 개발\n2. 이벤트 저장을 위한 데이터베이스 스키마 설계\n3. 이벤트 저장 및 조회 기능 구현\n4. 이벤트 스트림 재구성 기능\n5. 이벤트 버전 관리 및 스키마 진화\n6. 이벤트 아카이빙 및 정리 기능",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "통계 조회 API 및 통합 테스트 구현",
+            "description": "통계 데이터 조회 REST API를 구현하고 전체 이벤트 시스템의 통합 테스트를 작성합니다.",
+            "dependencies": [
+              "10.4",
+              "10.5",
+              "10.6"
+            ],
+            "details": "1. 통계 조회 REST API 구현\n2. 일별/월별/기간별 통계 조회 엔드포인트\n3. 통계 데이터 필터링 및 정렬 기능\n4. Kafka 연동 통합 테스트 작성\n5. 이벤트 발행/수신 테스트\n6. 통계 데이터 정확성 검증 테스트\n7. 실패 시나리오 테스트",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-20T08:30:13.453Z",
+      "updated": "2025-07-20T09:15:05.317Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
