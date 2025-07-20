@@ -38,14 +38,14 @@ project-root/
 - Aggregate Root 내에 비즈니스 로직을 만듬
 - 여러 Aggregate와 연관된 비즈니스 로직은 도메인 서비스로 분리
 
-### 1.1 domain context
+#### 1.1 domain context
 
 - 공용으로 사용되는 요소를 추상화한 interface
 - serviceName(요청도메인), userId, userName, roleId, requestId(uuid), requestedAt(Instant), clientIp 등등
 - http, kafka 이벤트등에서 해더 값으로 전달 받으며 이를 파싱하여 DomainContext 로 만듬
 - Aggregate 와 도메인 서비스의 함수는 항상 1번째 인자로 domain context를 받음
 
-### 1.2 domain 기본 모듈 구조
+#### 1.2 domain 기본 모듈 구조
 
 **하위 구성요소 및 역할:**
 
@@ -69,7 +69,7 @@ domain/service/
 └── OrderPolicyService.kt # 도메인 서비스
 ```
 
-### 1.3 domain 이벤트 모듈 구조
+#### 1.3 domain 이벤트 모듈 구조
 - Aggregate 변화가 생기면 항상 1개의 이벤트를 생성 및 발행한다.
 - DomainEvent, DomainEventBase 를 상속 받는다.
 
@@ -85,6 +85,28 @@ interface DomainEvent<T> {
 abstract class DomainEventBase<T> : DomainEvent<T> {
     override val eventId: UUID = UUID.randomUUID()
     override val occurredOn: Long = Date().time
+}
+```
+
+#### 1.4 domain 예외 모듈 구조
+
+- 도메인 내에서 발생한 예외는 항상 DomainException 상속 받은 예외를 만들어서 사용
+- DomainException, DomainExceptionBase 를 상속 받는다
+- 예외 케이스에 따라 추가적인 정보를 같이 포함 시킬 수 있다.
+- 예외 코드(ErrorCode)를 체계화 하여 정리 한다.
+
+**DomainException 예시:**
+```kotlin
+open class DomainException(
+    val code: String,
+    message: String,
+    originalError: Throwable? = null
+) : RuntimeException(message, originalError)
+
+enum class ErrorCode(val code: String, val message: String) {
+    ImpossibleCancel("OA050001", "취소 불가한 상태 입니다."),
+    NoRefundPolicy("OA052001", "환불 정책이 없습니다."),
+    InvalidItem("OA010001", "정상적인 상품아이템이 아닙니다.")
 }
 ```
 
