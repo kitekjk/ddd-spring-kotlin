@@ -26,10 +26,9 @@ class Order private constructor(
          * Creates a new Order instance.
          */
         fun create(
+            context: DomainContext,
             customerId: UserId,
-            lineItems: List<OrderLineItem>,
-            createdBy: String,
-            context: DomainContext
+            lineItems: List<OrderLineItem>
         ): Order {
             require(lineItems.isNotEmpty()) { "Order must have at least one line item" }
             
@@ -42,7 +41,7 @@ class Order private constructor(
                 orderDate = Instant.now(),
                 status = OrderStatus.PENDING,
                 totalAmount = totalAmount,
-                auditInfo = AuditInfo.newInstance(createdBy),
+                auditInfo = AuditInfo.newInstance(context.userId),
                 lineItems = lineItems.toMutableList()
             )
             
@@ -124,7 +123,7 @@ class Order private constructor(
      * Adds a line item to the order.
      * Can only add items when order is in PENDING status.
      */
-    fun addLineItem(lineItem: OrderLineItem, updatedBy: String): Order {
+    fun addLineItem(context: DomainContext, lineItem: OrderLineItem): Order {
         if (status != OrderStatus.PENDING) {
             throw IllegalStateException("Cannot add line items to order in ${status.name} status. Only PENDING orders can be modified.")
         }
@@ -139,7 +138,7 @@ class Order private constructor(
             orderDate = this.orderDate,
             status = this.status,
             totalAmount = newTotalAmount,
-            auditInfo = this.auditInfo.update(updatedBy),
+            auditInfo = this.auditInfo.update(context.userId),
             lineItems = newLineItems
         )
     }
@@ -148,7 +147,7 @@ class Order private constructor(
      * Removes a line item from the order.
      * Can only remove items when order is in PENDING status.
      */
-    fun removeLineItem(productId: ProductId, updatedBy: String): Order {
+    fun removeLineItem(context: DomainContext, productId: ProductId): Order {
         if (status != OrderStatus.PENDING) {
             throw IllegalStateException("Cannot remove line items from order in ${status.name} status. Only PENDING orders can be modified.")
         }
@@ -168,7 +167,7 @@ class Order private constructor(
             orderDate = this.orderDate,
             status = this.status,
             totalAmount = newTotalAmount,
-            auditInfo = this.auditInfo.update(updatedBy),
+            auditInfo = this.auditInfo.update(context.userId),
             lineItems = newLineItems
         )
     }
@@ -177,7 +176,7 @@ class Order private constructor(
      * Updates a line item in the order.
      * Can only update items when order is in PENDING status.
      */
-    fun updateLineItem(updatedLineItem: OrderLineItem, updatedBy: String): Order {
+    fun updateLineItem(context: DomainContext, updatedLineItem: OrderLineItem): Order {
         if (status != OrderStatus.PENDING) {
             throw IllegalStateException("Cannot update line items in order in ${status.name} status. Only PENDING orders can be modified.")
         }
@@ -198,7 +197,7 @@ class Order private constructor(
             orderDate = this.orderDate,
             status = this.status,
             totalAmount = newTotalAmount,
-            auditInfo = this.auditInfo.update(updatedBy),
+            auditInfo = this.auditInfo.update(context.userId),
             lineItems = newLineItems
         )
     }
@@ -207,7 +206,7 @@ class Order private constructor(
      * Marks the order as paid.
      * Can only transition from PENDING status.
      */
-    fun pay(updatedBy: String, context: DomainContext): Order {
+    fun pay(context: DomainContext): Order {
         validateStateTransition(OrderStatus.PENDING, OrderStatus.PAID)
         
         val paidOrder = Order(
@@ -216,7 +215,7 @@ class Order private constructor(
             orderDate = this.orderDate,
             status = OrderStatus.PAID,
             totalAmount = this.totalAmount,
-            auditInfo = this.auditInfo.update(updatedBy),
+            auditInfo = this.auditInfo.update(context.userId),
             lineItems = this.lineItems.toMutableList()
         )
         
@@ -230,7 +229,7 @@ class Order private constructor(
      * Marks the order as shipped.
      * Can only transition from PAID status.
      */
-    fun ship(updatedBy: String, context: DomainContext): Order {
+    fun ship(context: DomainContext): Order {
         validateStateTransition(OrderStatus.PAID, OrderStatus.SHIPPED)
         
         val shippedOrder = Order(
@@ -239,7 +238,7 @@ class Order private constructor(
             orderDate = this.orderDate,
             status = OrderStatus.SHIPPED,
             totalAmount = this.totalAmount,
-            auditInfo = this.auditInfo.update(updatedBy),
+            auditInfo = this.auditInfo.update(context.userId),
             lineItems = this.lineItems.toMutableList()
         )
         
@@ -253,7 +252,7 @@ class Order private constructor(
      * Marks the order as delivered.
      * Can only transition from SHIPPED status.
      */
-    fun deliver(updatedBy: String, context: DomainContext): Order {
+    fun deliver(context: DomainContext): Order {
         validateStateTransition(OrderStatus.SHIPPED, OrderStatus.DELIVERED)
         
         val deliveredOrder = Order(
@@ -262,7 +261,7 @@ class Order private constructor(
             orderDate = this.orderDate,
             status = OrderStatus.DELIVERED,
             totalAmount = this.totalAmount,
-            auditInfo = this.auditInfo.update(updatedBy),
+            auditInfo = this.auditInfo.update(context.userId),
             lineItems = this.lineItems.toMutableList()
         )
         
@@ -276,7 +275,7 @@ class Order private constructor(
      * Cancels the order.
      * Can only cancel orders that are in PENDING or PAID status.
      */
-    fun cancel(updatedBy: String, context: DomainContext): Order {
+    fun cancel(context: DomainContext): Order {
         if (status != OrderStatus.PENDING && status != OrderStatus.PAID) {
             throw IllegalStateException("Cannot cancel order in ${status.name} status. Only PENDING or PAID orders can be cancelled.")
         }
@@ -287,7 +286,7 @@ class Order private constructor(
             orderDate = this.orderDate,
             status = OrderStatus.CANCELLED,
             totalAmount = this.totalAmount,
-            auditInfo = this.auditInfo.update(updatedBy),
+            auditInfo = this.auditInfo.update(context.userId),
             lineItems = this.lineItems.toMutableList()
         )
         
