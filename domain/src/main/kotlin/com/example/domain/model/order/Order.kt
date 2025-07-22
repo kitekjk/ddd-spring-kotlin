@@ -16,8 +16,8 @@ class Order private constructor(
     val customerId: UserId,
     val orderDate: Instant,
     private var status: OrderStatus,
-    val totalAmount: BigDecimal,
-    val auditInfo: AuditInfo,
+    private var totalAmount: BigDecimal,
+    private var auditInfo: AuditInfo,
     private val lineItems: MutableList<OrderLineItem> = mutableListOf(),
     private val domainEvents: MutableList<DomainEvent<*>> = mutableListOf()
 ) {
@@ -81,6 +81,16 @@ class Order private constructor(
     fun getStatus(): OrderStatus = status
 
     /**
+     * Gets the total amount of the order.
+     */
+    fun getTotalAmount(): BigDecimal = totalAmount
+
+    /**
+     * Gets the audit information of the order.
+     */
+    fun getAuditInfo(): AuditInfo = auditInfo
+
+    /**
      * Gets the line items as an immutable list.
      */
     fun getLineItems(): List<OrderLineItem> = lineItems.toList()
@@ -123,177 +133,111 @@ class Order private constructor(
      * Adds a line item to the order.
      * Can only add items when order is in PENDING status.
      */
-    fun addLineItem(context: DomainContext, lineItem: OrderLineItem): Order {
+    fun addLineItem(context: DomainContext, lineItem: OrderLineItem) {
         if (status != OrderStatus.PENDING) {
             throw IllegalStateException("Cannot add line items to order in ${status.name} status. Only PENDING orders can be modified.")
         }
 
-        val newLineItems = this.lineItems.toMutableList()
-        newLineItems.add(lineItem)
-        val newTotalAmount = newLineItems.sumOf { it.getTotalPrice() }
-
-        return Order(
-            id = this.id,
-            customerId = this.customerId,
-            orderDate = this.orderDate,
-            status = this.status,
-            totalAmount = newTotalAmount,
-            auditInfo = this.auditInfo.update(context.userId),
-            lineItems = newLineItems
-        )
+        this.lineItems.add(lineItem)
+        this.totalAmount = this.lineItems.sumOf { it.getTotalPrice() }
+        this.auditInfo = this.auditInfo.update(context.userId)
     }
 
     /**
      * Removes a line item from the order.
      * Can only remove items when order is in PENDING status.
      */
-    fun removeLineItem(context: DomainContext, productId: ProductId): Order {
+    fun removeLineItem(context: DomainContext, productId: ProductId) {
         if (status != OrderStatus.PENDING) {
             throw IllegalStateException("Cannot remove line items from order in ${status.name} status. Only PENDING orders can be modified.")
         }
 
-        val newLineItems = this.lineItems.toMutableList()
-        newLineItems.removeIf { it.productId == productId }
+        this.lineItems.removeIf { it.productId == productId }
         
-        if (newLineItems.isEmpty()) {
+        if (this.lineItems.isEmpty()) {
             throw IllegalStateException("Order must have at least one line item")
         }
 
-        val newTotalAmount = newLineItems.sumOf { it.getTotalPrice() }
-
-        return Order(
-            id = this.id,
-            customerId = this.customerId,
-            orderDate = this.orderDate,
-            status = this.status,
-            totalAmount = newTotalAmount,
-            auditInfo = this.auditInfo.update(context.userId),
-            lineItems = newLineItems
-        )
+        this.totalAmount = this.lineItems.sumOf { it.getTotalPrice() }
+        this.auditInfo = this.auditInfo.update(context.userId)
     }
 
     /**
      * Updates a line item in the order.
      * Can only update items when order is in PENDING status.
      */
-    fun updateLineItem(context: DomainContext, updatedLineItem: OrderLineItem): Order {
+    fun updateLineItem(context: DomainContext, updatedLineItem: OrderLineItem) {
         if (status != OrderStatus.PENDING) {
             throw IllegalStateException("Cannot update line items in order in ${status.name} status. Only PENDING orders can be modified.")
         }
 
-        val newLineItems = this.lineItems.toMutableList()
-        val index = newLineItems.indexOfFirst { it.productId == updatedLineItem.productId }
+        val index = this.lineItems.indexOfFirst { it.productId == updatedLineItem.productId }
         
         if (index == -1) {
             throw IllegalArgumentException("Line item with product ID ${updatedLineItem.productId} not found in order")
         }
 
-        newLineItems[index] = updatedLineItem
-        val newTotalAmount = newLineItems.sumOf { it.getTotalPrice() }
-
-        return Order(
-            id = this.id,
-            customerId = this.customerId,
-            orderDate = this.orderDate,
-            status = this.status,
-            totalAmount = newTotalAmount,
-            auditInfo = this.auditInfo.update(context.userId),
-            lineItems = newLineItems
-        )
+        this.lineItems[index] = updatedLineItem
+        this.totalAmount = this.lineItems.sumOf { it.getTotalPrice() }
+        this.auditInfo = this.auditInfo.update(context.userId)
     }
 
     /**
      * Marks the order as paid.
      * Can only transition from PENDING status.
      */
-    fun pay(context: DomainContext): Order {
+    fun pay(context: DomainContext) {
         validateStateTransition(OrderStatus.PENDING, OrderStatus.PAID)
         
-        val paidOrder = Order(
-            id = this.id,
-            customerId = this.customerId,
-            orderDate = this.orderDate,
-            status = OrderStatus.PAID,
-            totalAmount = this.totalAmount,
-            auditInfo = this.auditInfo.update(context.userId),
-            lineItems = this.lineItems.toMutableList()
-        )
+        this.status = OrderStatus.PAID
+        this.auditInfo = this.auditInfo.update(context.userId)
         
         // Add OrderPaid event
-        paidOrder.addDomainEvent(OrderPaid(context, paidOrder.createEventPayload()))
-        
-        return paidOrder
+        this.addDomainEvent(OrderPaid(context, this.createEventPayload()))
     }
 
     /**
      * Marks the order as shipped.
      * Can only transition from PAID status.
      */
-    fun ship(context: DomainContext): Order {
+    fun ship(context: DomainContext) {
         validateStateTransition(OrderStatus.PAID, OrderStatus.SHIPPED)
         
-        val shippedOrder = Order(
-            id = this.id,
-            customerId = this.customerId,
-            orderDate = this.orderDate,
-            status = OrderStatus.SHIPPED,
-            totalAmount = this.totalAmount,
-            auditInfo = this.auditInfo.update(context.userId),
-            lineItems = this.lineItems.toMutableList()
-        )
+        this.status = OrderStatus.SHIPPED
+        this.auditInfo = this.auditInfo.update(context.userId)
         
         // Add OrderShipped event
-        shippedOrder.addDomainEvent(OrderShipped(context, shippedOrder.createEventPayload()))
-        
-        return shippedOrder
+        this.addDomainEvent(OrderShipped(context, this.createEventPayload()))
     }
 
     /**
      * Marks the order as delivered.
      * Can only transition from SHIPPED status.
      */
-    fun deliver(context: DomainContext): Order {
+    fun deliver(context: DomainContext) {
         validateStateTransition(OrderStatus.SHIPPED, OrderStatus.DELIVERED)
         
-        val deliveredOrder = Order(
-            id = this.id,
-            customerId = this.customerId,
-            orderDate = this.orderDate,
-            status = OrderStatus.DELIVERED,
-            totalAmount = this.totalAmount,
-            auditInfo = this.auditInfo.update(context.userId),
-            lineItems = this.lineItems.toMutableList()
-        )
+        this.status = OrderStatus.DELIVERED
+        this.auditInfo = this.auditInfo.update(context.userId)
         
         // Add OrderDelivered event
-        deliveredOrder.addDomainEvent(OrderDelivered(context, deliveredOrder.createEventPayload()))
-        
-        return deliveredOrder
+        this.addDomainEvent(OrderDelivered(context, this.createEventPayload()))
     }
 
     /**
      * Cancels the order.
      * Can only cancel orders that are in PENDING or PAID status.
      */
-    fun cancel(context: DomainContext): Order {
+    fun cancel(context: DomainContext) {
         if (status != OrderStatus.PENDING && status != OrderStatus.PAID) {
             throw IllegalStateException("Cannot cancel order in ${status.name} status. Only PENDING or PAID orders can be cancelled.")
         }
         
-        val cancelledOrder = Order(
-            id = this.id,
-            customerId = this.customerId,
-            orderDate = this.orderDate,
-            status = OrderStatus.CANCELLED,
-            totalAmount = this.totalAmount,
-            auditInfo = this.auditInfo.update(context.userId),
-            lineItems = this.lineItems.toMutableList()
-        )
+        this.status = OrderStatus.CANCELLED
+        this.auditInfo = this.auditInfo.update(context.userId)
         
         // Add OrderCancelled event
-        cancelledOrder.addDomainEvent(OrderCancelled(context, cancelledOrder.createEventPayload()))
-        
-        return cancelledOrder
+        this.addDomainEvent(OrderCancelled(context, this.createEventPayload()))
     }
 
     /**

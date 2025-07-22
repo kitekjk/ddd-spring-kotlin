@@ -6,12 +6,16 @@ import com.example.domain.model.user.UserId
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.test.context.TestConstructor
 import java.math.BigDecimal
 
 @DataJpaTest
+@EnableJpaRepositories(basePackages = ["com.example.infrastructure.persistence"])
+@EntityScan(basePackages = ["com.example.infrastructure.persistence"])
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class OrderRepositoryImplKotestTest(
     private val entityManager: TestEntityManager,
@@ -57,8 +61,8 @@ class OrderRepositoryImplKotestTest(
             then("기본 속성들이 올바르게 저장되어야 함") {
                 savedOrder.customerId shouldBe customerId
                 savedOrder.getStatus() shouldBe OrderStatus.PENDING
-                savedOrder.totalAmount shouldBe BigDecimal("100.00")
-                savedOrder.auditInfo.createdBy shouldBe "testUser"
+                savedOrder.getTotalAmount() shouldBe BigDecimal("100.00")
+                savedOrder.getAuditInfo().createdBy shouldBe "testUser"
             }
             
             then("라인 아이템이 올바르게 저장되어야 함") {
@@ -121,21 +125,21 @@ class OrderRepositoryImplKotestTest(
         
         `when`("주문 상태를 업데이트") {
             val updatedUserContext = DefaultDomainContext.user(userId = "updatedUser", userName = "Updated User", roleId = "USER")
-            val updatedOrder = savedOrder.pay(updatedUserContext)
-            val savedUpdatedOrder = orderRepository.save(updatedOrder)
+            savedOrder.pay(updatedUserContext)
+            val savedUpdatedOrder = orderRepository.save(savedOrder)
             entityManager.flush()
             entityManager.clear()
             
             then("상태가 업데이트되어야 함") {
                 savedUpdatedOrder.getStatus() shouldBe OrderStatus.PAID
-                savedUpdatedOrder.auditInfo.updatedBy shouldBe "updatedUser"
-                savedUpdatedOrder.auditInfo.updatedAt shouldNotBe savedOrder.auditInfo.updatedAt
+                savedUpdatedOrder.getAuditInfo().updatedBy shouldBe "updatedUser"
+                savedUpdatedOrder.getAuditInfo().updatedAt shouldNotBe savedOrder.getAuditInfo().updatedAt
             }
             
             then("데이터베이스에서 조회해도 업데이트된 상태여야 함") {
                 val reloadedOrder = orderRepository.findById(savedOrder.id!!)
                 reloadedOrder!!.getStatus() shouldBe OrderStatus.PAID
-                reloadedOrder.auditInfo.updatedBy shouldBe "updatedUser"
+                reloadedOrder.getAuditInfo().updatedBy shouldBe "updatedUser"
             }
         }
         

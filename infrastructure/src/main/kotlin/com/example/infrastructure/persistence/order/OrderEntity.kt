@@ -3,63 +3,10 @@ package com.example.infrastructure.persistence.order
 import com.example.domain.model.common.AuditInfo
 import com.example.domain.model.order.*
 import com.example.domain.model.user.UserId
+import com.example.infrastructure.persistence.common.AuditInfoEmbeddable
 import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.Instant
-
-/**
- * Embedded object for audit information in JPA entities.
- */
-@Embeddable
-data class AuditInfoEmbeddable(
-    @Column(name = "created_at", nullable = false)
-    var createdAt: Instant,
-
-    @Column(name = "created_by", nullable = false, length = 100)
-    var createdBy: String,
-
-    @Column(name = "updated_at", nullable = false)
-    var updatedAt: Instant,
-
-    @Column(name = "updated_by", nullable = false, length = 100)
-    var updatedBy: String
-) {
-    /**
-     * Converts this embedded object to domain AuditInfo.
-     */
-    fun toDomain(): AuditInfo {
-        return AuditInfo.of(
-            createdAt = createdAt,
-            createdBy = createdBy,
-            updatedAt = updatedAt,
-            updatedBy = updatedBy
-        )
-    }
-
-    companion object {
-        /**
-         * Creates an AuditInfoEmbeddable from domain AuditInfo.
-         */
-        fun fromDomain(auditInfo: AuditInfo): AuditInfoEmbeddable {
-            return AuditInfoEmbeddable(
-                createdAt = auditInfo.createdAt,
-                createdBy = auditInfo.createdBy,
-                updatedAt = auditInfo.updatedAt,
-                updatedBy = auditInfo.updatedBy
-            )
-        }
-    }
-
-    /**
-     * Updates this embedded object from domain AuditInfo.
-     */
-    fun updateFromDomain(auditInfo: AuditInfo) {
-        this.createdAt = auditInfo.createdAt
-        this.createdBy = auditInfo.createdBy
-        this.updatedAt = auditInfo.updatedAt
-        this.updatedBy = auditInfo.updatedBy
-    }
-}
 
 /**
  * JPA entity for Order aggregate root.
@@ -132,8 +79,8 @@ class OrderEntity(
         this.customerId = order.customerId.value
         this.orderDate = order.orderDate
         this.status = order.getStatus().name
-        this.totalAmount = order.totalAmount
-        this.auditInfo.updateFromDomain(order.auditInfo)
+        this.totalAmount = order.getTotalAmount()
+        this.auditInfo.updateFromDomain(order.getAuditInfo())
 
         // Update line items
         this.lineItems.clear()
@@ -153,8 +100,8 @@ class OrderEntity(
                 customerId = order.customerId.value,
                 orderDate = order.orderDate,
                 status = order.getStatus().name,
-                totalAmount = order.totalAmount,
-                auditInfo = AuditInfoEmbeddable.fromDomain(order.auditInfo)
+                totalAmount = order.getTotalAmount(),
+                auditInfo = AuditInfoEmbeddable.fromDomain(order.getAuditInfo())
             )
 
             // Add line items

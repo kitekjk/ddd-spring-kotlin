@@ -62,10 +62,10 @@ class OrderKotestTest : StringSpec({
         // Then
         order.id shouldBe null
         order.customerId shouldBe validCustomerId
-        order.totalAmount shouldBe BigDecimal("100.00") // 2*30 + 1*40 = 100
+        order.getTotalAmount() shouldBe BigDecimal("100.00") // 2*30 + 1*40 = 100
         order.getStatus() shouldBe OrderStatus.PENDING
-        order.auditInfo.createdBy shouldBe testContext.userId
-        order.auditInfo.updatedBy shouldBe testContext.userId
+        order.getAuditInfo().createdBy shouldBe testContext.userId
+        order.getAuditInfo().updatedBy shouldBe testContext.userId
         order.getLineItems().size shouldBe 2
         
         // Check domain events
@@ -110,7 +110,7 @@ class OrderKotestTest : StringSpec({
         )
         
         // Then
-        order.totalAmount shouldBe BigDecimal("107.00") // 3*25.50 + 2*15.25 = 76.50 + 30.50 = 107.00
+        order.getTotalAmount() shouldBe BigDecimal("107.00") // 3*25.50 + 2*15.25 = 76.50 + 30.50 = 107.00
     }
     
     "should reconstitute order from persistence" {
@@ -139,8 +139,8 @@ class OrderKotestTest : StringSpec({
         order.customerId shouldBe validCustomerId
         order.orderDate shouldBe orderDate
         order.getStatus() shouldBe status
-        order.totalAmount shouldBe totalAmount
-        order.auditInfo shouldBe auditInfo
+        order.getTotalAmount() shouldBe totalAmount
+        order.getAuditInfo() shouldBe auditInfo
         order.getLineItems().size shouldBe 2
         order.getDomainEvents().size shouldBe 0 // No events for reconstituted orders
     }
@@ -155,17 +155,18 @@ class OrderKotestTest : StringSpec({
         val updaterContext = DefaultDomainContext.user(userId = "admin", userName = "Admin", roleId = "ADMIN")
         
         // When
-        val paidOrder = order.pay(updaterContext)
+        order.pay(updaterContext)
         
         // Then
-        paidOrder.getStatus() shouldBe OrderStatus.PAID
-        paidOrder.auditInfo.updatedBy shouldBe updaterContext.userId
-        paidOrder.getLineItems().size shouldBe 2
+        order.getStatus() shouldBe OrderStatus.PAID
+        order.getAuditInfo().updatedBy shouldBe updaterContext.userId
+        order.getLineItems().size shouldBe 2
         
-        // Check domain events
-        val events = paidOrder.getDomainEvents()
-        events.size shouldBe 1
-        events[0].shouldBeInstanceOf<OrderPaid>()
+        // Check domain events - should have OrderCreated + OrderPaid
+        val events = order.getDomainEvents()
+        events.size shouldBe 2
+        events[0].shouldBeInstanceOf<OrderCreated>()
+        events[1].shouldBeInstanceOf<OrderPaid>()
     }
     
     "should throw exception when paying an order that is not PENDING" {
@@ -176,11 +177,11 @@ class OrderKotestTest : StringSpec({
             lineItems = createTestLineItems()
         )
         val adminContext = DefaultDomainContext.user(userId = "admin", userName = "Admin", roleId = "ADMIN")
-        val paidOrder = order.pay(adminContext)
+        order.pay(adminContext)
         
         // When & Then
         shouldThrow<IllegalStateException> {
-            paidOrder.pay(adminContext)
+            order.pay(adminContext)
         }
     }
     
@@ -192,20 +193,22 @@ class OrderKotestTest : StringSpec({
             lineItems = createTestLineItems()
         )
         val adminContext = DefaultDomainContext.user(userId = "admin", userName = "Admin", roleId = "ADMIN")
-        val paidOrder = order.pay(adminContext)
+        order.pay(adminContext)
         val shipperContext = DefaultDomainContext.user(userId = "shipper", userName = "Shipper", roleId = "SHIPPER")
         
         // When
-        val shippedOrder = paidOrder.ship(shipperContext)
+        order.ship(shipperContext)
         
         // Then
-        shippedOrder.getStatus() shouldBe OrderStatus.SHIPPED
-        shippedOrder.auditInfo.updatedBy shouldBe shipperContext.userId
+        order.getStatus() shouldBe OrderStatus.SHIPPED
+        order.getAuditInfo().updatedBy shouldBe shipperContext.userId
         
-        // Check domain events
-        val events = shippedOrder.getDomainEvents()
-        events.size shouldBe 1
-        events[0].shouldBeInstanceOf<OrderShipped>()
+        // Check domain events - should have OrderCreated + OrderPaid + OrderShipped
+        val events = order.getDomainEvents()
+        events.size shouldBe 3
+        events[0].shouldBeInstanceOf<OrderCreated>()
+        events[1].shouldBeInstanceOf<OrderPaid>()
+        events[2].shouldBeInstanceOf<OrderShipped>()
     }
     
     "should throw exception when shipping an order that is not PAID" {
@@ -231,22 +234,25 @@ class OrderKotestTest : StringSpec({
             lineItems = createTestLineItems()
         )
         val adminContext = DefaultDomainContext.user(userId = "admin", userName = "Admin", roleId = "ADMIN")
-        val paidOrder = order.pay(adminContext)
+        order.pay(adminContext)
         val shipperContext = DefaultDomainContext.user(userId = "shipper", userName = "Shipper", roleId = "SHIPPER")
-        val shippedOrder = paidOrder.ship(shipperContext)
+        order.ship(shipperContext)
         val delivererContext = DefaultDomainContext.user(userId = "deliverer", userName = "Deliverer", roleId = "DELIVERER")
         
         // When
-        val deliveredOrder = shippedOrder.deliver(delivererContext)
+        order.deliver(delivererContext)
         
         // Then
-        deliveredOrder.getStatus() shouldBe OrderStatus.DELIVERED
-        deliveredOrder.auditInfo.updatedBy shouldBe delivererContext.userId
+        order.getStatus() shouldBe OrderStatus.DELIVERED
+        order.getAuditInfo().updatedBy shouldBe delivererContext.userId
         
-        // Check domain events
-        val events = deliveredOrder.getDomainEvents()
-        events.size shouldBe 1
-        events[0].shouldBeInstanceOf<OrderDelivered>()
+        // Check domain events - should have OrderCreated + OrderPaid + OrderShipped + OrderDelivered
+        val events = order.getDomainEvents()
+        events.size shouldBe 4
+        events[0].shouldBeInstanceOf<OrderCreated>()
+        events[1].shouldBeInstanceOf<OrderPaid>()
+        events[2].shouldBeInstanceOf<OrderShipped>()
+        events[3].shouldBeInstanceOf<OrderDelivered>()
     }
     
     "should throw exception when delivering an order that is not SHIPPED" {
@@ -274,16 +280,17 @@ class OrderKotestTest : StringSpec({
         val adminContext = DefaultDomainContext.user(userId = "admin", userName = "Admin", roleId = "ADMIN")
         
         // When
-        val cancelledOrder = order.cancel(adminContext)
+        order.cancel(adminContext)
         
         // Then
-        cancelledOrder.getStatus() shouldBe OrderStatus.CANCELLED
-        cancelledOrder.auditInfo.updatedBy shouldBe adminContext.userId
+        order.getStatus() shouldBe OrderStatus.CANCELLED
+        order.getAuditInfo().updatedBy shouldBe adminContext.userId
         
-        // Check domain events
-        val events = cancelledOrder.getDomainEvents()
-        events.size shouldBe 1
-        events[0].shouldBeInstanceOf<OrderCancelled>()
+        // Check domain events - should have OrderCreated + OrderCancelled
+        val events = order.getDomainEvents()
+        events.size shouldBe 2
+        events[0].shouldBeInstanceOf<OrderCreated>()
+        events[1].shouldBeInstanceOf<OrderCancelled>()
     }
     
     "should cancel PAID order" {
@@ -294,15 +301,22 @@ class OrderKotestTest : StringSpec({
             lineItems = createTestLineItems()
         )
         val adminContext = DefaultDomainContext.user(userId = "admin", userName = "Admin", roleId = "ADMIN")
-        val paidOrder = order.pay(adminContext)
+        order.pay(adminContext)
         val cancellerContext = DefaultDomainContext.user(userId = "canceller", userName = "Canceller", roleId = "ADMIN")
         
         // When
-        val cancelledOrder = paidOrder.cancel(cancellerContext)
+        order.cancel(cancellerContext)
         
         // Then
-        cancelledOrder.getStatus() shouldBe OrderStatus.CANCELLED
-        cancelledOrder.auditInfo.updatedBy shouldBe cancellerContext.userId
+        order.getStatus() shouldBe OrderStatus.CANCELLED
+        order.getAuditInfo().updatedBy shouldBe cancellerContext.userId
+        
+        // Check domain events - should have OrderCreated + OrderPaid + OrderCancelled
+        val events = order.getDomainEvents()
+        events.size shouldBe 3
+        events[0].shouldBeInstanceOf<OrderCreated>()
+        events[1].shouldBeInstanceOf<OrderPaid>()
+        events[2].shouldBeInstanceOf<OrderCancelled>()
     }
     
     "should throw exception when cancelling SHIPPED order" {
@@ -313,13 +327,13 @@ class OrderKotestTest : StringSpec({
             lineItems = createTestLineItems()
         )
         val adminContext = DefaultDomainContext.user(userId = "admin", userName = "Admin", roleId = "ADMIN")
-        val paidOrder = order.pay(adminContext)
+        order.pay(adminContext)
         val shipperContext = DefaultDomainContext.user(userId = "shipper", userName = "Shipper", roleId = "SHIPPER")
-        val shippedOrder = paidOrder.ship(shipperContext)
+        order.ship(shipperContext)
         
         // When & Then
         shouldThrow<IllegalStateException> {
-            shippedOrder.cancel(adminContext)
+            order.cancel(adminContext)
         }
     }
     
@@ -331,15 +345,15 @@ class OrderKotestTest : StringSpec({
             lineItems = createTestLineItems()
         )
         val adminContext = DefaultDomainContext.user(userId = "admin", userName = "Admin", roleId = "ADMIN")
-        val paidOrder = order.pay(adminContext)
+        order.pay(adminContext)
         val shipperContext = DefaultDomainContext.user(userId = "shipper", userName = "Shipper", roleId = "SHIPPER")
-        val shippedOrder = paidOrder.ship(shipperContext)
+        order.ship(shipperContext)
         val delivererContext = DefaultDomainContext.user(userId = "deliverer", userName = "Deliverer", roleId = "DELIVERER")
-        val deliveredOrder = shippedOrder.deliver(delivererContext)
+        order.deliver(delivererContext)
         
         // When & Then
         shouldThrow<IllegalStateException> {
-            deliveredOrder.cancel(adminContext)
+            order.cancel(adminContext)
         }
     }
     
@@ -359,12 +373,17 @@ class OrderKotestTest : StringSpec({
         val updaterContext = DefaultDomainContext.user(userId = "updater", userName = "Updater", roleId = "USER")
         
         // When
-        val updatedOrder = order.addLineItem(updaterContext, newLineItem)
+        order.addLineItem(updaterContext, newLineItem)
         
         // Then
-        updatedOrder.getLineItems().size shouldBe 2
-        updatedOrder.totalAmount shouldBe BigDecimal("150.00") // 100 + 50
-        updatedOrder.auditInfo.updatedBy shouldBe updaterContext.userId
+        order.getLineItems().size shouldBe 2
+        order.getTotalAmount() shouldBe BigDecimal("150.00") // 100 + 50
+        order.getAuditInfo().updatedBy shouldBe updaterContext.userId
+        
+        // Check domain events - should still have only OrderCreated (addLineItem doesn't generate events)
+        val events = order.getDomainEvents()
+        events.size shouldBe 1
+        events[0].shouldBeInstanceOf<OrderCreated>()
     }
     
     "should throw exception when adding line item to non-PENDING order" {
@@ -375,7 +394,7 @@ class OrderKotestTest : StringSpec({
             lineItems = createTestLineItems()
         )
         val adminContext = DefaultDomainContext.user(userId = "admin", userName = "Admin", roleId = "ADMIN")
-        val paidOrder = order.pay(adminContext)
+        order.pay(adminContext)
         val newLineItem = OrderLineItem.create(
             productId = ProductId.of(3L),
             productName = "New Product",
@@ -385,7 +404,7 @@ class OrderKotestTest : StringSpec({
         
         // When & Then
         shouldThrow<IllegalStateException> {
-            paidOrder.addLineItem(adminContext, newLineItem)
+            order.addLineItem(adminContext, newLineItem)
         }
     }
     
@@ -399,12 +418,17 @@ class OrderKotestTest : StringSpec({
         val updaterContext = DefaultDomainContext.user(userId = "updater", userName = "Updater", roleId = "USER")
         
         // When
-        val updatedOrder = order.removeLineItem(updaterContext, ProductId.of(1L))
+        order.removeLineItem(updaterContext, ProductId.of(1L))
         
         // Then
-        updatedOrder.getLineItems().size shouldBe 1
-        updatedOrder.totalAmount shouldBe BigDecimal("40.00") // Only Product 2 remains
-        updatedOrder.auditInfo.updatedBy shouldBe updaterContext.userId
+        order.getLineItems().size shouldBe 1
+        order.getTotalAmount() shouldBe BigDecimal("40.00") // Only Product 2 remains
+        order.getAuditInfo().updatedBy shouldBe updaterContext.userId
+        
+        // Check domain events - should still have only OrderCreated (removeLineItem doesn't generate events)
+        val events = order.getDomainEvents()
+        events.size shouldBe 1
+        events[0].shouldBeInstanceOf<OrderCreated>()
     }
     
     "should throw exception when removing line item from non-PENDING order" {
@@ -415,11 +439,11 @@ class OrderKotestTest : StringSpec({
             lineItems = createTestLineItems()
         )
         val adminContext = DefaultDomainContext.user(userId = "admin", userName = "Admin", roleId = "ADMIN")
-        val paidOrder = order.pay(adminContext)
+        order.pay(adminContext)
         
         // When & Then
         shouldThrow<IllegalStateException> {
-            paidOrder.removeLineItem(adminContext, ProductId.of(1L))
+            order.removeLineItem(adminContext, ProductId.of(1L))
         }
     }
     
@@ -439,12 +463,17 @@ class OrderKotestTest : StringSpec({
         val updaterContext = DefaultDomainContext.user(userId = "updater", userName = "Updater", roleId = "USER")
         
         // When
-        val updatedOrder = order.updateLineItem(updaterContext, updatedLineItem)
+        order.updateLineItem(updaterContext, updatedLineItem)
         
         // Then
-        updatedOrder.getLineItems().size shouldBe 2
-        updatedOrder.totalAmount shouldBe BigDecimal("115.00") // 3*25 + 1*40 = 75 + 40 = 115
-        updatedOrder.auditInfo.updatedBy shouldBe updaterContext.userId
+        order.getLineItems().size shouldBe 2
+        order.getTotalAmount() shouldBe BigDecimal("115.00") // 3*25 + 1*40 = 75 + 40 = 115
+        order.getAuditInfo().updatedBy shouldBe updaterContext.userId
+        
+        // Check domain events - should still have only OrderCreated (updateLineItem doesn't generate events)
+        val events = order.getDomainEvents()
+        events.size shouldBe 1
+        events[0].shouldBeInstanceOf<OrderCreated>()
     }
     
     "should clear domain events" {
@@ -462,7 +491,7 @@ class OrderKotestTest : StringSpec({
         order.getDomainEvents().size shouldBe 0
     }
     
-    "should maintain immutability when transitioning states" {
+    "should accumulate domain events across state changes" {
         // Given
         val order = Order.create(
             context = testContext,
@@ -471,19 +500,51 @@ class OrderKotestTest : StringSpec({
         )
         val adminContext = DefaultDomainContext.user(userId = "admin", userName = "Admin", roleId = "ADMIN")
         val shipperContext = DefaultDomainContext.user(userId = "shipper", userName = "Shipper", roleId = "SHIPPER")
+        val delivererContext = DefaultDomainContext.user(userId = "deliverer", userName = "Deliverer", roleId = "DELIVERER")
         
-        // When
-        val paidOrder = order.pay(adminContext)
-        val shippedOrder = paidOrder.ship(shipperContext)
+        // When - perform multiple state changes
+        order.pay(adminContext)
+        order.ship(shipperContext)
+        order.deliver(delivererContext)
         
-        // Then
-        order.getStatus() shouldBe OrderStatus.PENDING
-        paidOrder.getStatus() shouldBe OrderStatus.PAID
-        shippedOrder.getStatus() shouldBe OrderStatus.SHIPPED
+        // Then - all events should be accumulated
+        order.getStatus() shouldBe OrderStatus.DELIVERED
+        order.getAuditInfo().updatedBy shouldBe delivererContext.userId
         
-        // Original order should remain unchanged
-        order.auditInfo.updatedBy shouldBe testContext.userId
-        paidOrder.auditInfo.updatedBy shouldBe adminContext.userId
-        shippedOrder.auditInfo.updatedBy shouldBe shipperContext.userId
+        val events = order.getDomainEvents()
+        events.size shouldBe 4
+        events[0].shouldBeInstanceOf<OrderCreated>()
+        events[1].shouldBeInstanceOf<OrderPaid>()
+        events[2].shouldBeInstanceOf<OrderShipped>()
+        events[3].shouldBeInstanceOf<OrderDelivered>()
+    }
+    
+    "should preserve domain events when modifying line items" {
+        // Given
+        val order = Order.create(
+            context = testContext,
+            customerId = validCustomerId,
+            lineItems = createSingleLineItem()
+        )
+        val newLineItem = OrderLineItem.create(
+            productId = ProductId.of(2L),
+            productName = "New Product",
+            quantity = 1,
+            unitPrice = BigDecimal("50.00")
+        )
+        val updaterContext = DefaultDomainContext.user(userId = "updater", userName = "Updater", roleId = "USER")
+        
+        // When - add line item then pay
+        order.addLineItem(updaterContext, newLineItem)
+        order.pay(updaterContext)
+        
+        // Then - both events should be preserved
+        val events = order.getDomainEvents()
+        events.size shouldBe 2
+        events[0].shouldBeInstanceOf<OrderCreated>()
+        events[1].shouldBeInstanceOf<OrderPaid>()
+        
+        order.getTotalAmount() shouldBe BigDecimal("150.00") // 100 + 50
+        order.getStatus() shouldBe OrderStatus.PAID
     }
 })

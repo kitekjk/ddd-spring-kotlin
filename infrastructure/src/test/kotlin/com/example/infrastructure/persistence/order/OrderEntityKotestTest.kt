@@ -75,11 +75,11 @@ class OrderEntityKotestTest : BehaviorSpec({
                 convertedOrder.customerId.value shouldBe 1L
                 convertedOrder.orderDate shouldBe orderDate
                 convertedOrder.getStatus() shouldBe OrderStatus.PENDING
-                convertedOrder.totalAmount shouldBe totalAmount
-                convertedOrder.auditInfo.createdAt shouldBe auditInfo.createdAt
-                convertedOrder.auditInfo.createdBy shouldBe auditInfo.createdBy
-                convertedOrder.auditInfo.updatedAt shouldBe auditInfo.updatedAt
-                convertedOrder.auditInfo.updatedBy shouldBe auditInfo.updatedBy
+                convertedOrder.getTotalAmount() shouldBe totalAmount
+                convertedOrder.getAuditInfo().createdAt shouldBe auditInfo.createdAt
+                convertedOrder.getAuditInfo().createdBy shouldBe auditInfo.createdBy
+                convertedOrder.getAuditInfo().updatedAt shouldBe auditInfo.updatedAt
+                convertedOrder.getAuditInfo().updatedBy shouldBe auditInfo.updatedBy
             }
             
             then("라인 아이템이 올바르게 변환되어야 함") {
@@ -95,9 +95,9 @@ class OrderEntityKotestTest : BehaviorSpec({
         `when`("엔티티를 도메인 객체로 업데이트") {
             val entity = OrderEntity.fromDomain(order)
             val updaterContext = DefaultDomainContext.user(userId = "updatedUser", userName = "Updated User", roleId = "USER")
-            val updatedOrder = order.pay(updaterContext)
+            order.pay(updaterContext)
             
-            entity.updateFromDomain(updatedOrder)
+            entity.updateFromDomain(order)
             
             then("상태가 업데이트되어야 함") {
                 entity.status shouldBe "PAID"
